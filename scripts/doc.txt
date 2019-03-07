@@ -1,0 +1,5 @@
+para grabar en flash se puede hacer make download en la herarquia del proyecto o bien ./debug y load
+para el debug lo que hago es cargar primero el openocd en el localhost:3333 y LUEGO cargo el gdb
+eso lo hago asi y NO con el pipe porque no me anduvo.. es lo mismo, pero se ve que por un tema de tiempos o algo no le gusta..
+pero ya fue.. anda de lujo asi
+dgb_tui anda de lujo tambien

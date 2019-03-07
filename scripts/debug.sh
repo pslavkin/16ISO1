@@ -1,0 +1,6 @@
+#primero llamo al openocd (por defecon conecta al localhost:3333) y manda los mensajes los errores a consola y queda por background
+#luego llama al programita cgdb que a su vez invoca al gdb d earm con un archivo de configuracino muyyy basico.. why? porque el cgdb es mas bonito que el gdb -tui pelado y puedo hacer shortcuts de teclado, definir breaks etc mas rapido...
+#no lo hago con el metodo pipe porque no me funciono... pero es lo mismo...
+#pkill openocd
+#openocd -f ./scripts/openocd.cfg 1> /dev/null 2> /dev/null &
+cgdb -d arm-none-eabi-gdb -q ./out/16iso1.elf --command=./scripts/command.gdb
