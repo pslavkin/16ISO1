@@ -6,34 +6,28 @@
 .global SysTick_Handler
 .thumb_func     // modo thumb,bit 0 en 1 para las direcciones. (antes de la 1ra instruccion)
 
-   //void SysTick_Handler(void)  //proto en C
-
-#define i         r4
-
-
 
 SysTick_Handler:
-   ldr  r0 , =taskList
-   ldr  r1 , =runningTask
-   ldr  r2 , [r1]
-   ldr  r3 , [r0 ,r2 ,lsl #2]
-   str  sp , [r3]
+   push {r4-r11}                    //estos registros no se guardan automaticamente
+   ldr  r0 , =taskList              //direccion del arreglo a lista de tareas
+   ldr  r1 , =runningTask           //direccion del indice de la tarea en curso
+   ldr  r2 , [r1]                   //ok, este es el indice
+   ldr  r3 , [r0 ,r2 ,lsl #2]       //leo el puntero a la tarea en curso con esta magia
+   str  sp , [r3]                   //y el primer item de la lista de tareas el justamente el sp, asi que lo guardo asi sin mas
 
-   ldr  r3 ,=taskCount
-   ldr  r3 , [r3]
-   add  r2 ,1
-   cmp  r2 ,r3
-   bcc  dontResetRunningTask
+   ldr  r3 ,=taskCount              //cuantas tareas hay en curso?
+   ldr  r3 , [r3]                   //r3 tareas..
+   add  r2 ,1                       //sumemos 1 a la tarea running
+   cmp  r2 ,r3                      //comparo y veo si tengo que resetear
+   bcc  dontResetRunningTask        //reseto? o no?
 
 resetRunningTask:
-      mov  r2 , #0
+      mov  r2 , #0                  //sip
 
-dontResetRunningTask:
-   str  r2 ,[r1]
-   ldr  r3 , [r0 ,r2 ,lsl #2]
-   ldr  sp ,[r3]
-   ldr  r2 , [sp ,#24]
-   orr  r2 , #1
-   str  r2 , [sp ,#24]
-   bx   lr
+dontResetRunningTask:               //nop
+   str  r2 ,[r1]                    //nueva tarea en curso
+   ldr  r3 , [r0 ,r2 ,lsl #2]       //cargo ahora el pntero a la estructura de la nueva tarea en curso
+   ldr  sp ,[r3]                    //el primer item de la estructura es el sp, asi que lo leo
+   pop {r4-r11}                     //listo, saco los registros no autmaticos
+   bx   lr                          //a rezar que no vuele por el aira..
 
