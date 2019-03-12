@@ -1,11 +1,14 @@
 #include "main.h"         // <= Su propia cabecera
 #include "string.h"
 #include "sapi.h"        // <= Biblioteca sAPI
+#include "switcher.h"
 
 taskContext*   taskList[10];
 uint32_t       taskCount   = 0;
 uint32_t       runningTask = 0;
 taskContext    t1,t2,t3,tn;
+taskContext    kernelContext;
+taskContext    *runningContext;
 
 bool stackPush(uint32_t data, taskContext* c)/*{{{*/
 {
@@ -79,18 +82,30 @@ void taskNull(void* a)/*{{{*/
 int main( void )
 {
    boardConfig();
-   taskCreate("tarea1"   ,task1    ,&t1);
-   taskCreate("tarea2"   ,task2    ,&t2);
-   taskCreate("taskNull" ,taskNull ,&tn);
-
-   runningTask=2; //arranca desde la ultima tarea
-   taskDelete(&tn);  //pero justo despues la elimina, con lo cual la tarea 2 nunca se va a ejecutar, 
-                     //y es justo lo que necesito. Porque entonces genere el stack inicial en donde se van a pushear todas las cosas en el 
-                     //primer salto de la irq.. es una bosta el metodo pero funca por ahora
+   taskCreate("tarea1"     ,task1      ,&t1);
+   taskCreate("tarea2"     ,task2      ,&t2);
+   taskCreate("tarea1"     ,task1      ,&t1);
+   taskCreate("tarea2"     ,task2      ,&t2);
+   taskCreate("tarea3"     ,task3      ,&t3);
+   taskCreate("kernel"     ,kernelTask ,&kernelContext);
+   
+   runningTask=0;
+   runningContext=&tn;
    SysTick_Config( (SystemCoreClock * (tick_t)50) / 1000 );
 
    while( TRUE ) {
    }
 
    return 0;
+}
+
+
+
+
+void kernelTask(void* a)
+{
+   while(1) {
+      runningTask=0;
+   }
+
 }

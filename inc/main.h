@@ -1,15 +1,8 @@
-/*============================================================================
- * Licencia:
- * Autor:
- * Fecha:
- *===========================================================================*/
-
-#ifndef _APP_H_
-#define _APP_H_
+#ifndef MAIN
+#define MAIN
 
 #include <stdint.h>
 /*==================[inclusiones]============================================*/
-
 /*==================[c++]====================================================*/
 
 #ifdef __cplusplus
@@ -17,7 +10,6 @@ extern "C" {
 #endif
 
 /*==================[macros]=================================================*/
-
 /*==================[tipos de datos declarados por el usuario]===============*/
 #define MIN_STACK        100
 #define TASK_NAME_LENGTH 16
@@ -28,9 +20,10 @@ typedef struct taskContext_t {
    char name[TASK_NAME_LENGTH];
 } taskContext;
 /*==================[declaraciones de datos externos]========================*/
-void task1(void* a);
-void task2(void* a);
-void task3(void* a);
+void task1      ( void* a );
+void task2      ( void* a );
+void task3      ( void* a );
+void kernelTask ( void* a );
 
 /*==================[declaraciones de funciones externas]====================*/
 
@@ -40,4 +33,4 @@ void task3(void* a);
 #endif
 
 /*==================[end of file]============================================*/
-#endif /* _APP_H_ */
+#endif
