@@ -2,19 +2,17 @@
 #include "string.h"
 #include "sapi.h"        // <= Biblioteca sAPI
 
-uint32_t i,j,k;
-volatile int   first_shot=1;
 taskContext*   taskList[10];
-uint32_t       taskCount=0;
-uint32_t       runningTask=0;
-taskContext t1,t2,t3,tn;
+uint32_t       taskCount   = 0;
+uint32_t       runningTask = 0;
+taskContext    t1,t2,t3,tn;
 
-bool stackPush(uint32_t data, taskContext* c)
+bool stackPush(uint32_t data, taskContext* c)/*{{{*/
 {
    c->pool_index--;
    *c->pool_index=data;
-}
-bool taskCreate(const char* name, void (*func)(void*),taskContext* c)
+}/*}}}*/
+bool taskCreate(const char* name, void (*func)(void*),taskContext* c)/*{{{*/
 {
    strcpy(c->name,name);                        //la tarea guard su nombre
    c->pool_index=&(c->pool[MIN_STACK]);         //el pool es estativo y fijo, se guarda el puntero a la ultima posicion porque funcionara como stak de arriba para abao
@@ -37,47 +35,46 @@ bool taskCreate(const char* name, void (*func)(void*),taskContext* c)
    stackPush ( 0                           ,c ); // r10
    stackPush ( 0                           ,c ); // r11
    taskList[taskCount++]=c;                     //habemos una tarea extra
-}
-bool taskDelete(taskContext* c)
+}/*}}}*/
+bool taskDelete(taskContext* c)/*{{{*/
 {
   taskCount--;    //tarea menos
-}
-void task1(void* a)
+}/*}}}*/
+void task1(void* a)/*{{{*/
 {
+   uint32_t i;
    while(1) {
       for (i=0;i<5000000;i++)
          ;
       gpioToggle(LED1);
    }
-}
-void task2(void* a)
+}/*}}}*/
+void task2(void* a)/*{{{*/
 {
+   uint32_t i;
    while(1) {
-      for (j=0;j<1090000;j++) {
+      for (i=0;i<1000000;i++) {
          if(taskCount<3 && gpioRead( TEC1)==false)
             taskCreate("tarea3"   ,task3    ,&t3);
       }
       gpioToggle(LED2);
 
    }
-}
-void task3(void* a)
+}/*}}}*/
+void task3(void* a)/*{{{*/
 {
+   uint32_t i;
    while(1) {
-      for (k=0;k<1000000;k++)
+      for (i=0;i<5000000;i++)
          ;
          gpioToggle(LED3);
    }
-}
-void taskNull(void* a)
+}/*}}}*/
+void taskNull(void* a)/*{{{*/
 {
    while(1) {
    }
-}
-
-
-
-
+}/*}}}*/
 
 int main( void )
 {
