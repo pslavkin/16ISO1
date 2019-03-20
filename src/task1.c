@@ -10,8 +10,7 @@ void* task1(void* a)
 {
    uint32_t i;
    while(1) {
-      for (i=0;i<3000000;i++)
-         ;
+      taskDelay(3000);
       gpioToggle(LED1);
       uartWriteString( UART_USB , context1.name);
       uartWriteString( UART_USB , "\r\n");

@@ -8,6 +8,7 @@ uint32_t       taskCount   = 0;
 uint32_t       runningTask = 0;
 taskContext    *runningContext;
 taskContext    kernelContext;
+uint32_t       tick = 0;
 
 bool stackPush(uint32_t data, taskContext* c)
 {
@@ -39,27 +40,56 @@ bool pushTask(const char* name, void* (*func)(void*),void* param, taskContext* c
    stackPush ( 0                           ,c ); // r11
 }
 
-bool taskCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, void* (*hook)(void*))
+bool taskCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, uint32_t prior, void* (*hook)(void*))
 {
    pushTask(name,func,param,context,hook);
+   context->sleepTicks=0;
+   context->state=ACTIVE;
+   context->prior=prior;
    taskList[taskCount++]=context;                      // habemos una tarea extra
 }
-bool kernelCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, void* (*hook)(void*))
+bool kernelCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, uint32_t prior, void* (*hook)(void*))
 {
    pushTask(name,func,param,context,hook);
    runningTask    = 0;
    runningContext = &kernelContext;
+   taskCount      = 0;
 }
+
 bool taskDelete(taskContext* c)
 {
   taskCount--;    //tarea menos
 }
+bool taskDelay(uint32_t t)
+{
+   runningContext->sleepTicks=t;
+   runningContext->state=SLEEPING;
+   __WFI();
+}
 
 void* kernelTask(void* p) //round robin por ahora (pero con hook)
 {
-   if(++runningTask>=taskCount)
-      runningTask=0;
-   runningContext=taskList[runningTask];
+   tick++;
+   uint8_t i;
+   uint8_t actualPrior     = 0;
+
+   for(i=0;i<taskCount;i++) {
+      switch (taskList[i]->state) {
+         case SLEEPING:
+            if(--taskList[i]->sleepTicks == 0)
+               taskList[i]->state = ACTIVE;
+            break;
+         case ACTIVE:
+            if(taskList[i]->prior >= actualPrior) {
+               actualPrior = taskList[i]->prior;
+               runningTask = i;
+            }
+            break;
+         default:
+            break;
+      }
+      runningContext=taskList[runningTask];
+   }
 }
 void* hookKernel(void* p)
 {
