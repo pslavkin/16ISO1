@@ -1,6 +1,6 @@
 .syntax unified             // elije thumb o thumb2
 .extern runningContext
-.extern taskList
+.extern kernelContext
 .extern taskKernel
 .text
 .global PendSV_Handler
@@ -14,7 +14,7 @@ PendSV_Handler:
    ldr  r5 ,[r4]            // runnungContext es el contexto de la tarea interrumpida
    str  sp ,[r5]            // listo, guardado por donde iba el sp
 
-   ldr  r2 , =taskList      // cambio a contexto kernel (es ooootro stack porque sino podria pisar el stack de la tarea interrumpida)
+   ldr  r2 , =kernelContext // cambio a contexto kernel (es ooootro stack porque sino podria pisar el stack de la tarea interrumpida)
    ldr  sp , [r2]           // listo, ahora si tengo mi propio stack y puedo procesar
    push {lr}                // peeero, antes de llamar al kernel, guardo el 0xFFFFFFF9
    bl   taskKernel          // llamo al kernel

@@ -4,7 +4,8 @@
 #include "sapi.h"
 #include "taskkernel.h"
 
-uint32_t taskKernelPool[MIN_STACK];
+taskContext    kernelContext;
+uint32_t       taskKernelPool[16];  //en el 1er salto, el sp se pisa con el del main... que tiene 32k
 taskContext    *runningContext;
 
 taskParams taskKernelParams = {
@@ -22,12 +23,8 @@ void* taskKernel(void* p) //round robin por ahora (pero con hook)
    uint8_t actualPrior = 0;
    uint8_t runningTask;
 
-   for(i=1;i<MAX_TASK;i++) {
+   for(i=0;i<MAX_TASK;i++) {
       switch (taskList[i].state) {
-         case SLEEPING:
-            if(--taskList[i].sleepTicks == 0)
-               taskList[i].state = ACTIVE;
-            break;
          case ACTIVE:
             if(taskList[i].prior >= actualPrior) {
                actualPrior = taskList[i].prior;

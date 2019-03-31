@@ -9,6 +9,7 @@ extern "C" {
 /*==================[tipos de datos declarados por el usuario]===============*/
 extern taskParams taskKernelParams;
 /*==================[declaraciones de datos externos]========================*/
+extern taskContext    kernelContext;
 extern taskContext    *runningContext;
 void* taskKernel      ( void* a );
 void* hookKernel      ( void* p );

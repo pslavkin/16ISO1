@@ -8,6 +8,7 @@
 DEBUG_PRINT_ENABLE
 CONSOLE_PRINT_ENABLE
 
+
 int main( void )
 {
    boardConfig();
@@ -17,13 +18,10 @@ int main( void )
    NVIC_SetPriority(PendSV_IRQn,(1<<__NVIC_PRIO_BITS) -1);
 
    initTasks();
-   taskCreate ( &taskKernelParams ,9 );
-   taskCreate ( &taskIdleParams   ,1 );
    taskCreate ( &task1Params      ,1 );
    taskCreate ( &task2Params      ,1 );
    taskCreate ( &task3Params      ,1 );
    Init_SysTick();
-
 
    while( TRUE )
       ;

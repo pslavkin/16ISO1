@@ -3,63 +3,62 @@
 #include "os.h"
 #include "taskkernel.h"
 #include "sapi.h"
+#include "taskidle.h"
 
 taskContext    taskList[MAX_TASK];
 uint32_t       taskCount   = 0;
 uint32_t       tick        = 0;
 
-bool stackPush(uint32_t data, taskContext* c)
-{
-   c->sp--;
-   *c->sp=data;
-}
 bool pushTask(taskParams* t, taskContext* c)
 {
-   stackPush ( 1<<24              ,c ); // PSR     //comiezo a pushear todo ,bit de modo thumb en uno siempre
-   stackPush ( (uint32_t)t->func  ,c ); // PC
-   stackPush ( (uint32_t)t->hook  ,c ); // LR
-   stackPush ( 0                  ,c ); // r12
+   *(--c->sp)=1<<24              ; // PSR                //comiezo a pushear todo ,bit de modo thumb en uno siempre
+   *(--c->sp)=(uint32_t)t->func  ; // PC
+   *(--c->sp)=(uint32_t)t->hook  ; // LR
+   *(--c->sp)=0                  ; // r12
 
-   stackPush ( 0                  ,c ); // r3
-   stackPush ( 0                  ,c ); // r2
-   stackPush ( 0                  ,c ); // r1
-   stackPush ( (uint32_t)t->param ,c ); // r0
+   *(--c->sp)=0                  ; // r3
+   *(--c->sp)=0                  ; // r2
+   *(--c->sp)=0                  ; // r1
+   *(--c->sp)=(uint32_t)t->param ; // r0
 
-   stackPush ( 0                  ,c ); // r4
-   stackPush ( 0                  ,c ); // r5
-   stackPush ( 0                  ,c ); // r6
-   stackPush ( 0                  ,c ); // r7
+   *(--c->sp)=0                  ; // r4
+   *(--c->sp)=0                  ; // r5
+   *(--c->sp)=0                  ; // r6
+   *(--c->sp)=0                  ; // r7
 
-   stackPush ( 0                  ,c ); // r8
-   stackPush ( 0                  ,c ); // r9
-   stackPush ( 0                  ,c ); // r10
-   stackPush ( 0                  ,c ); // r11
+   *(--c->sp)=0                  ; // r8
+   *(--c->sp)=0                  ; // r9
+   *(--c->sp)=0                  ; // r10
+   *(--c->sp)=0                  ; // r11
 }
 
-bool initTasks(void)
+bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
 {
-   uint8_t i;
-   for(i=0;i<MAX_TASK;i++) {
-      taskList[i].state=EMPTY;
-   }
-   runningContext=&taskList[8];
-}
-bool taskCreate(taskParams* t, uint32_t prior)
-{
-   taskContext* c;
-   if(taskCount>=MAX_TASK)
-      return false;
-   else {
-      c             = &taskList[taskCount];
-      c->pool       = t->pool;// el pool es estativo y fijo, se guarda el puntero a la ultima posicion porque funcionara como stak de arriba para abao
+      c->pool       = t->pool;
       c->sp         = &t->pool[t->pool_size];
       c->state      = ACTIVE;
       c->sleepTicks = 0;
       c->prior      = prior;
       strcpy(c->name,t->name); // la tarea guard su nombre
       pushTask(t,c);
-      taskCount++;
+}
+
+bool taskCreate(taskParams* t, uint32_t prior)
+{
+   if(taskCount>=MAX_TASK)
+      return false;
+   else
+      taskFill(t,&taskList[taskCount++],prior);
+}
+bool initTasks(void)
+{
+   uint8_t i;
+   for(i=0;i<MAX_TASK;i++) {
+      taskList[i].state=EMPTY;
    }
+   taskFill(&taskKernelParams,&kernelContext,0);
+   runningContext=&kernelContext;           //waf? el primer salto se hace de main con el stack principal.. se lo regalo al kerneltask por ahora, 
+   taskCreate ( &taskIdleParams ,1 );     //tarea idle
 }
 bool taskDelete(taskContext* c)
 {
@@ -84,7 +83,19 @@ void Init_SysTick(void)
 }
 void SysTick_Handler(void)
 {
-   yield();
    tick++;
+   uint8_t i;
+
+   for(i=0;i<MAX_TASK;i++) {
+      switch (taskList[i].state) {
+         case SLEEPING:
+            if(--taskList[i].sleepTicks == 0)
+               taskList[i].state = ACTIVE;
+            break;
+         default:
+            break;
+      }
+   }
+   yield();
 }
 
