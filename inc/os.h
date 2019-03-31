@@ -10,32 +10,44 @@ extern "C" {
 #endif
 /*==================[macros]=================================================*/
 /*==================[tipos de datos declarados por el usuario]===============*/
+#define MAX_TASK         10
 #define MIN_STACK        100
-#define KERNEL_STACK     20
 #define TASK_NAME_LENGTH 16
-
 
 enum taskState{
    ACTIVE=0,
    SLEEPING,
+   EMPTY,
 };
 
 typedef struct    taskContext_t {
-   uint32_t*      pool_index;
-   uint32_t       pool[MIN_STACK];
-   char           name[TASK_NAME_LENGTH];
+   uint32_t*      sp;
+   uint32_t*      pool;
    enum taskState state;
    uint32_t       sleepTicks;
+   char           name[TASK_NAME_LENGTH];
    uint8_t        prior;
 } taskContext;
 
+typedef struct    taskParams_t {
+   char           name[TASK_NAME_LENGTH];
+   uint32_t*      pool;
+   uint32_t       pool_size;
+   void*          (*func)(void*);
+   void*          param;
+   void*          (*hook)(void*);
+} taskParams;
+
 extern taskContext    kernelContext;
+extern taskParams     taskKernelParams;
+extern taskContext    taskList[MAX_TASK]; //nop... esto no TODO
 /*==================[declaraciones de datos externos]========================*/
-bool taskCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, uint32_t prior, void* (*hook)(void*));
-bool kernelCreate(const char* name, void* (*func)(void*),void* param, taskContext* context, uint32_t prior, void* (*hook)(void*));
-void* kernelTask ( void* p );
-void* hookKernel ( void* p );
-bool taskDelay(uint32_t t)  ;
+bool initTasks       ( void                          );
+bool taskCreate      ( taskParams* t, uint32_t prior );
+void yield           ( void                          );
+bool taskDelay       ( uint32_t t                    );
+void Init_SysTick    ( void                          );
+void SysTick_Handler ( void                          );
 /*==================[declaraciones de funciones externas]====================*/
 /*==================[c++]====================================================*/
 #ifdef __cplusplus

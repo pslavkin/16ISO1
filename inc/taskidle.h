@@ -7,7 +7,7 @@ extern "C" {
 #endif
 /*==================[macros]=================================================*/
 /*==================[tipos de datos declarados por el usuario]===============*/
-extern taskContext    contextIdle;
+extern taskParams taskIdleParams;
 /*==================[declaraciones de datos externos]========================*/
 void* taskIdle      ( void* a );
 void* hookIdle      ( void* p );

@@ -4,13 +4,23 @@
 #include "sapi.h"
 #include "taskidle.h"
 
-taskContext    contextIdle;
+uint32_t taskIdlePool[MIN_STACK];
+
+taskParams taskIdleParams = {
+   .name      = "taskIdle",
+   .pool      = taskIdlePool,
+   .pool_size = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
+   .param     = NULL,
+   .func      = taskIdle,
+   .hook      = hookIdle
+};
 
 void* taskIdle(void* a)
 {
    uint32_t i;
    while(1) {
       gpioToggle(LEDB);
+      __WFI();
       //uartWriteString( UART_USB , contextIdle.name);
       //uartWriteString( UART_USB , "\r\n");
    }

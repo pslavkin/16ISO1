@@ -4,7 +4,16 @@
 #include "sapi.h"
 #include "task2.h"
 
-taskContext    context2;
+uint32_t task2Pool[MIN_STACK];
+
+taskParams task2Params = {
+   .name      = "task2",
+   .pool      = task2Pool,
+   .pool_size = sizeof(task2Pool)/sizeof(task2Pool[0]),
+   .param     = NULL,
+   .func      = task2,
+   .hook      = hook2
+};
 
 void* task2(void* a)
 {
@@ -12,7 +21,7 @@ void* task2(void* a)
    while(1) {
       taskDelay(6000);
       gpioToggle(LED2);
-      uartWriteString( UART_USB , context2.name);
+      uartWriteString( UART_USB , task2Params.name);
       uartWriteString( UART_USB , "\r\n");
    }
    return NULL;

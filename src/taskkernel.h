@@ -1,5 +1,5 @@
-#ifndef TASK1
-#define TASK1
+#ifndef TASKKERNEL
+#define TASKKERNEL
 /*==================[inclusiones]============================================*/
 /*==================[c++]====================================================*/
 #ifdef __cplusplus
@@ -7,10 +7,11 @@ extern "C" {
 #endif
 /*==================[macros]=================================================*/
 /*==================[tipos de datos declarados por el usuario]===============*/
-extern taskParams task1Params;
+extern taskParams taskKernelParams;
 /*==================[declaraciones de datos externos]========================*/
-void* task1      ( void* a );
-void* hook1      ( void* p );
+extern taskContext    *runningContext;
+void* taskKernel      ( void* a );
+void* hookKernel      ( void* p );
 /*==================[declaraciones de funciones externas]====================*/
 /*==================[c++]====================================================*/
 #ifdef __cplusplus
