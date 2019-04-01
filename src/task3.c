@@ -19,7 +19,7 @@ void* task3(void* a)
 {
    uint32_t i;
    while(1) {
-      taskDelay(9000);
+      taskDelay(300);
       gpioToggle(LED3);
       uartWriteString( UART_USB , task3Params.name);
       uartWriteString( UART_USB , "\r\n");

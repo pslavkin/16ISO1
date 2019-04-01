@@ -7,10 +7,9 @@ extern "C" {
 #endif
 /*==================[macros]=================================================*/
 /*==================[tipos de datos declarados por el usuario]===============*/
-extern taskParams taskKernelParams;
 /*==================[declaraciones de datos externos]========================*/
 extern taskContext    kernelContext;
-extern taskContext    *runningContext;
+extern taskParams     taskKernelParams;
 void* taskKernel      ( void* a );
 void* hookKernel      ( void* p );
 /*==================[declaraciones de funciones externas]====================*/

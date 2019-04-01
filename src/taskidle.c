@@ -17,12 +17,9 @@ taskParams taskIdleParams = {
 
 void* taskIdle(void* a)
 {
-   uint32_t i;
    while(1) {
       gpioToggle(LEDB);
       __WFI();
-      //uartWriteString( UART_USB , contextIdle.name);
-      //uartWriteString( UART_USB , "\r\n");
    }
    return NULL;
 }

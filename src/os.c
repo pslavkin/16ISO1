@@ -5,9 +5,9 @@
 #include "sapi.h"
 #include "taskidle.h"
 
-taskContext    taskList[MAX_TASK];
-uint32_t       taskCount   = 0;
-uint32_t       tick        = 0;
+taskContext    taskList[MAX_PRIOR][MAX_TASK];
+taskContext    *runningContext;
+uint8_t        taskCount[MAX_PRIOR]   = {0};
 
 bool pushTask(taskParams* t, taskContext* c)
 {
@@ -36,29 +36,33 @@ bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
 {
       c->pool       = t->pool;
       c->sp         = &t->pool[t->pool_size];
-      c->state      = ACTIVE;
+      c->state      = READY;
       c->sleepTicks = 0;
       c->prior      = prior;
-      strcpy(c->name,t->name); // la tarea guard su nombre
-      pushTask(t,c);
+      strcpy   ( c->name ,t->name ); // la tarea guard su nombre
+      pushTask ( t       ,c       );
+      return true;
 }
 
 bool taskCreate(taskParams* t, uint32_t prior)
 {
-   if(taskCount>=MAX_TASK)
-      return false;
+   if(taskCount[prior]<MAX_TASK)
+      return taskFill(t,&taskList[prior][taskCount[prior]++],prior);
    else
-      taskFill(t,&taskList[taskCount++],prior);
+      return false;
 }
 bool initTasks(void)
 {
-   uint8_t i;
-   for(i=0;i<MAX_TASK;i++) {
-      taskList[i].state=EMPTY;
+   uint8_t i,j;
+
+   for(i=0;i<MAX_PRIOR;i++) {
+      for(j=0;j<MAX_TASK;j++) {
+         taskList[i][j].state=EMPTY;
+      }
    }
    taskFill(&taskKernelParams,&kernelContext,0);
-   runningContext=&kernelContext;           //waf? el primer salto se hace de main con el stack principal.. se lo regalo al kerneltask por ahora, 
-   taskCreate ( &taskIdleParams ,1 );     //tarea idle
+   runningContext=&kernelContext;         //wah? el primer salto se hace de main con el stack principal.. se lo regalo al kerneltask por ahora, 
+   taskCreate ( &taskIdleParams ,0 );     //tarea idle
 }
 bool taskDelete(taskContext* c)
 {
@@ -72,30 +76,7 @@ void yield(void)
 bool taskDelay(uint32_t t)
 {
    runningContext->sleepTicks = t;
-   runningContext->state      = SLEEPING;
-   yield();
-}
-
-void Init_SysTick(void)
-{
-   SysTick_Config( (SystemCoreClock * (tick_t)50) / 100 );
-   yield();
-}
-void SysTick_Handler(void)
-{
-   tick++;
-   uint8_t i;
-
-   for(i=0;i<MAX_TASK;i++) {
-      switch (taskList[i].state) {
-         case SLEEPING:
-            if(--taskList[i].sleepTicks == 0)
-               taskList[i].state = ACTIVE;
-            break;
-         default:
-            break;
-      }
-   }
+   runningContext->state      = WAITING;
    yield();
 }
 

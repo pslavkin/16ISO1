@@ -6,7 +6,6 @@
 
 taskContext    kernelContext;
 uint32_t       taskKernelPool[16];  //en el 1er salto, el sp se pisa con el del main... que tiene 32k
-taskContext    *runningContext;
 
 taskParams taskKernelParams = {
    .name      = "taskKernel",
@@ -19,22 +18,21 @@ taskParams taskKernelParams = {
 
 void* taskKernel(void* p) //round robin por ahora (pero con hook)
 {
-   uint8_t i;
-   uint8_t actualPrior = 0;
-   uint8_t runningTask;
+   uint8_t i,j;
 
-   for(i=0;i<MAX_TASK;i++) {
-      switch (taskList[i].state) {
-         case ACTIVE:
-            if(taskList[i].prior >= actualPrior) {
-               actualPrior = taskList[i].prior;
-               runningTask = i;
-            }
-            break;
-         default:
-            break;
+   for (i=MAX_PRIOR;i>0;) {
+      i--;
+      for(j=0;j<MAX_TASK;j++) {
+         switch (taskList[i][j].state) {
+            case READY:
+               runningContext        = &taskList[i][j];
+               runningContext->state = RUNNING;
+               return NULL;
+               break;
+            default:
+               break;
+         }
       }
-      runningContext=&taskList[runningTask];
    }
 }
 void* hookKernel(void* p)

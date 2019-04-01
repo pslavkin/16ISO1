@@ -11,12 +11,14 @@ extern "C" {
 /*==================[macros]=================================================*/
 /*==================[tipos de datos declarados por el usuario]===============*/
 #define MAX_TASK         10
+#define MAX_PRIOR        10
 #define MIN_STACK        100
 #define TASK_NAME_LENGTH 16
 
 enum taskState{
-   ACTIVE=0,
-   SLEEPING,
+   READY=0,
+   WAITING,
+   RUNNING,
    EMPTY,
 };
 
@@ -38,16 +40,13 @@ typedef struct    taskParams_t {
    void*          (*hook)(void*);
 } taskParams;
 
-extern taskContext    kernelContext;
-extern taskParams     taskKernelParams;
-extern taskContext    taskList[MAX_TASK]; //nop... esto no TODO
+taskContext    taskList[MAX_PRIOR][MAX_TASK];
+extern taskContext    *runningContext;
 /*==================[declaraciones de datos externos]========================*/
 bool initTasks       ( void                          );
 bool taskCreate      ( taskParams* t, uint32_t prior );
 void yield           ( void                          );
 bool taskDelay       ( uint32_t t                    );
-void Init_SysTick    ( void                          );
-void SysTick_Handler ( void                          );
 /*==================[declaraciones de funciones externas]====================*/
 /*==================[c++]====================================================*/
 #ifdef __cplusplus
