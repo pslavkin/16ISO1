@@ -18,9 +18,11 @@ taskParams taskIdleParams = {
 void* taskIdle(void* a)
 {
    while(1) {
-      gpioToggle(LEDB);
-      __WFI();
-   }
+      gpioToggle(LEDB); // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
+      __WFI();          // la proxima irq
+}
    return NULL;
 }
-void* hookIdle(void* p) {}
+void* hookIdle(void* p)
+{
+}

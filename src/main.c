@@ -10,24 +10,23 @@
 DEBUG_PRINT_ENABLE
 CONSOLE_PRINT_ENABLE
 
-
 int main( void )
 {
    boardConfig();
    debugPrintConfigUart( UART_USB, 115200 );
 
-   initPendsv ( );
+   initPendsv ( );                 // se usa para solicitar que salte irq para el cambio de contexto
 
-   initTasks  ( );
-   taskCreate ( &task1Params      ,2 );
-   taskCreate ( &task2Params      ,2 );
-   taskCreate ( &task3Params      ,2 );
+   initTasks  ( );                 // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
+   taskCreate ( &task2Params ,3 ); // se deja fuera la prioridad para visualizarlas aca
+   taskCreate ( &task1Params ,3 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
+   taskCreate ( &task3Params ,4 );
 
-   initSystick ( );
-   yield       ( );
+   initSystick   ( );              // irq de base de tiempo
+   triggerPendSv ( );              // solicita irq para que todo avance.
 
-   while( TRUE )
-      ;
-   return 0;
+   while( TRUE )                   // nunca llegara aca, porque en el primer cambio de
+      ;                            // contexto se guarda el contexto del main como el contexto del kernelTask
+   return 0;                       // de modo que el sp del kernel stack pasa a ser el de este main.
 }
 

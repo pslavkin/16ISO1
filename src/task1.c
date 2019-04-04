@@ -17,14 +17,18 @@ taskParams task1Params = {
 
 void* task1(void* a)
 {
-   uint32_t i;
+   uint32_t i,j;
    while(1) {
-//      taskDelay(100);
-   for(i=0;i<1000000;i++)
-      ;
-      gpioToggle(LED1);
-      uartWriteString( UART_USB , task1Params.name);
-      uartWriteString( UART_USB , "\r\n");
+      //      taskDelay(100);
+      for(j=0;j<10;j++) {
+         for(i=0;i<1000000;i++)
+            ;
+         gpioToggle(LED1);
+      //   uartWriteString( UART_USB , task1Params.name);
+      //   uartWriteString( UART_USB , "\r\n");
+      }
+
+//      taskYield();
    }
    return NULL;
 }
