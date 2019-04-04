@@ -9,3 +9,4 @@ void initPendsv(void)
    //irq's simultanteas
    NVIC_SetPriority(PendSV_IRQn,(1<<__NVIC_PRIO_BITS) -1);
 }
+

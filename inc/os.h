@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "semphr.h"
 
 #define MAX_PRIOR        10 // 10 prioridades, cada una
 #define MAX_TASK         10 // con 10 tareas
@@ -18,6 +19,7 @@ enum taskState{
             // no se necesita para nada
    EMPTY,   // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta
             // usando por ahora..
+   BLOCKED, // la estoy usando para los mutex por ejemplo
 };
 
 
@@ -33,6 +35,7 @@ typedef struct    taskContext_t {
                                           // see. pero es rapida, facil y no indexa. my room, my rules
    uint32_t*      pool;                   // puntero al inicio del stack (no al final) por el final arranca sp
    enum taskState state;                  // running, waiting, etc.
+   semphr_t*      semphr;                 //TODO comments...
    uint32_t       sleepTicks;             // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad

@@ -3,6 +3,10 @@
 #include "os.h"
 #include "sapi.h"
 #include "task1.h"
+#include "semphr.h"
+
+
+semphr_t semphrTask1;
 
 uint32_t task1Pool[MIN_STACK];
 
@@ -18,17 +22,21 @@ taskParams task1Params = {
 void* task1(void* a)
 {
    uint32_t i,j;
+   mutexInit(&semphrTask1);
+
    while(1) {
       //      taskDelay(100);
       for(j=0;j<10;j++) {
          for(i=0;i<1000000;i++)
             ;
          gpioToggle(LED1);
-      //   uartWriteString( UART_USB , task1Params.name);
-      //   uartWriteString( UART_USB , "\r\n");
+         mutexLock(&semphrTask1);
+            uartWriteString( UART_USB , task1Params.name);
+            uartWriteString( UART_USB , " hola este es un texto laaaaargo para que tarde un bien rato \r\n");
+         mutexUnlock(&semphrTask1);
       }
-
-//      taskYield();
+      taskDelay(1);
+      //taskYield();
    }
    return NULL;
 }

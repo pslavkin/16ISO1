@@ -10,6 +10,15 @@ void initSystick(void)
 {
    SysTick_Config( SystemCoreClock /100); //ticks cada 10msegs
 }
+void enableSystickIrq(void)
+{
+  SysTick->CTRL  |= SysTick_CTRL_ENABLE_Msk;
+}
+void disableSystickIrq(void)
+{
+  SysTick->CTRL  &= ~SysTick_CTRL_ENABLE_Msk;
+}
+
 void SysTick_Handler(void)
 {
    uint8_t i,j;

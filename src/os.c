@@ -4,6 +4,7 @@
 #include "taskkernel.h"
 #include "sapi.h"
 #include "taskidle.h"
+#include "systick.h"
 
 tasks_t  tasks; // aca defino la lista estatica de todas las tareas posibles de ser agregadas al sistema
                 // es bastatnte ineficiente porque tengo que dejar previsto en compilacion las
@@ -110,7 +111,6 @@ bool taskDelay(uint32_t t)
 bool taskYield(void)
 {
    tasks.context->state = READY; // la tarea que llama claramente esta en running, pasa a ready
-                                 // para que sea llamada nuevamente ni bien pueda
    triggerPendSv();              // listo, llamo a cambio de contecto
 }
 
