@@ -6,7 +6,7 @@
 extern semphr_t   printfMutex;
 extern taskParams task1Params;
 /*==================[declaraciones de datos externos]========================*/
-void  printfMutexInit ( void    );
+void  initPrintfMutex ( void    );
 void* task1           ( void* a );
 void* hook1           ( void* p );
 /*==================[end of file]============================================*/

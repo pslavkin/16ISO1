@@ -20,7 +20,7 @@ PendSV_Handler:
    bl   taskKernel          // llamo al kernel
    pop  {lr}                // ahora si recupero mi 0xFFFFFFF9 (redordad que se grabo en el stak del kernel nada mas)
 
-// ldr  r0 ,=tasks          //no hace falta, porque el que use r4 lo tiene que salvar, asi que nadie me lo puedo tocar (espero)
+// ldr  r4 ,=tasks          //no hace falta, porque el que use r4 lo tiene que salvar, asi que nadie me lo puedo tocar (espero)
    ldr  r5 ,[r4]            // que sera??
    ldr  sp ,[r5]            // lo que sea, tomo lo que apunta y le mando el sp
    pop  {r4-r11}            // listo, saco los registros no autmaticos

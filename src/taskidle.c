@@ -11,7 +11,7 @@ taskContext    idleContext; // la tarea Idle esta fuera de la lista estatica de
                             // la tarea mas baja de todas las prioridades, de
                             // hecho no se le pregunta la prioridad nunca, solo
                             // se ejecuta cuando ninguna otra esta ready y el
-                            // scheduler no tien lo que hacer...
+                            // scheduler no tiene lo que hacer...
 
 taskParams taskIdleParams = {
    .name      = "taskIdle",
@@ -19,17 +19,14 @@ taskParams taskIdleParams = {
    .pool_size = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
    .param     = NULL,
    .func      = taskIdle,
-   .hook      = hookIdle
+   .hook      = defaultHook,
 };
 
 WEAK void* taskIdle(void* a) // atributo weak para que pueda ser redefinida por el usuario sin tocar nada..
 {
    while(1) {
-      gpioToggle(LEDB);      // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
-      __WFI();               // la proxima irq
+      gpioToggle(LEDB); // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
+      __WFI();          // la proxima irq
    }
    return NULL;
-}
-void* hookIdle(void* p)
-{
 }

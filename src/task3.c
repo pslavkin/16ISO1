@@ -3,6 +3,7 @@
 #include "os.h"
 #include "sapi.h"
 #include "semphr.h"
+#include "systick.h"
 #include "task1.h"
 #include "task3.h"
 
@@ -20,7 +21,7 @@ taskParams task3Params = {
 void* task3(void* a)
 {
    while(1) {
-      taskDelay( 3);
+      taskDelay(mseg2Ticks(30));
       gpioToggle(LED3);
       mutexLock  ( &printfMutex );
          stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",

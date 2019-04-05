@@ -5,14 +5,14 @@
 #include <stdbool.h>
 #include "semphr.h"
 
-#define WEAK __attribute__ ((weak))
-#define ALIAS(f) __attribute__ ((weak, alias (#f)))
+#define WEAK        __attribute__ ((weak))
+#define ALIAS(f)    __attribute__ ((weak, alias (#f)))
 
-#define MAX_PRIOR        10 // 10 prioridades, cada una
-#define MAX_TASK         10 // con 10 tareas
+#define MAX_PRIOR        10  // 10 prioridades, cada una
+#define MAX_TASK         10  // con 10 tareas
 #define MIN_STACK        200 // minimo stack para cada tarea, pero igualmente cada tarea puede
-                            // elgir lo que desee
-#define TASK_NAME_LENGTH 16 // en el contexto de control tambien se guarda el nombre de fantasia.
+                             // elgir lo que desee
+#define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.
 
 enum taskState{
    READY=0, // esperando su turno.
@@ -38,7 +38,7 @@ typedef struct    taskContext_t {
                                           // see. pero es rapida, facil y no indexa. my room, my rules
    uint32_t*      pool;                   // puntero al inicio del stack (no al final) por el final arranca sp
    enum taskState state;                  // running, waiting, etc.
-   semphr_t*      semphr;                 //TODO comments...
+   semphr_t*      semphr;                 // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
    uint32_t       sleepTicks;             // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad
@@ -52,8 +52,8 @@ typedef struct tasks_struct {
                                                // tambien su sp.. propenso a errores? puede ser, mala programacion? ponele, es peor que un
                                                // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                                // see. pero es rapida, facil y no indexa. my room, my rules
-   uint8_t        index[ MAX_TASK];            // para cada priodidad llevo un index para saber a cual le toca luego
-   taskContext    list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana
+   uint8_t        index[ MAX_PRIOR];            // para cada priodidad llevo un index para saber a cual le toca luego
+   taskContext    list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana estatica
 } tasks_t;
 
 //en esta estructura tengo los campos de cada tarea, el nombre, el pool, etc. 
@@ -66,10 +66,14 @@ typedef struct    taskParams_t {
    void*          (*hook)(void*);         // si func termina se llama a hook. si hook termina bum!
 } taskParams;
 
-extern tasks_t   tasks; // y si... es global.. la uso en switcher, y en taskKernel.. decideo publicarla, aunque lo correcto seria hacer alguna funcion que tome sus campos publicos asi nadie piuede meter mano...
-                        // pero eso implicaria tiempo de uC.. la otra seria usar clases de C++ y declarar algunas clases
-                        // amigas.. pero escapa al objetivo del curso..Sino se podria meter os, taskKernel en on solo
-                        // file y hacerme creer que es OOP... lo dejo global...
+//y si... es global.. la uso en switcher, y en taskKernel.. decido publicarla,
+//aunque lo correcto seria hacer alguna funcion que tome sus campos publicos
+//asi nadie piuede meter mano...  pero eso implicaria tiempo de uC.. la otra
+//seria usar clases de C++ y declarar algunas clases amigas..  pero escapa al
+//objetivo del curso..Sino se podria meter os, taskKernel en on solo file y
+//hacerme creer que es OOP... lo dejo global...
+extern tasks_t   tasks;
+
 /*==================[declaraciones de datos externos]========================*/
 bool  initTasks     ( void                          );
 bool  taskCreate    ( taskParams* t, uint32_t prior );

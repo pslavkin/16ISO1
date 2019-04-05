@@ -10,15 +10,14 @@
 DEBUG_PRINT_ENABLE
 CONSOLE_PRINT_ENABLE
 
-
 int main( void )
 {
-   boardConfig();
-   debugPrintConfigUart( UART_USB, 115200 );
+   boardConfig          (                  );
+   debugPrintConfigUart ( UART_USB, 115200 );
 
    initPendsv ( );                 // se usa para solicitar que salte irq para el cambio de contexto
 
-   printfMutexInit ( );            //inicializa un mutex para evitar que varias tareas corrompan la impresion por uart de otra0
+   initPrintfMutex ( );            //inicializa un mutex para evitar que varias tareas corrompan la impresion por uart de otra0
    initTasks       ( );            // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
    taskCreate ( &task1Params ,2 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task2Params ,4 ); // se deja fuera la prioridad para visualizarlas aca

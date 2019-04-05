@@ -27,19 +27,27 @@ bool mutexUnlock   ( semphr_t* m )
 {
    int8_t i,j,k;
    m->locked=false;                                    // primero libero el mutex
-   // recorro HASTA mi misma prioridad. porque nadie de menor prioridad que yo puede interrumpirme. De modo
-   // que si yo tengo el mutex, solo alguien mas importante pudo haber intentado quitarmelo. y a esa tarea es
-   // a la que se lo doy.
+   // recorro HASTA mi misma prioridad. porque nadie de menor prioridad que yo
+   // puede interrumpirme. De modo que si yo tengo el mutex, solo alguien mas
+   // importante pudo haber intentado quitarmelo. y a esa tarea es a la que se
+   // lo doy. Notar que lo recorro siempre en round_robin. Si el scheduler es
+   // FIFO, entonces aunque haga roun robin, ninguna otra tarea de mi misma
+   // prioridad pudo haber querido tomar el mutex, con lo cual no hace falta
+   // discriminar si estoy en FIFO o RR, porque el scheduler obliga a que las
+   // cosas pasen de una u otra manera
    for (i=(MAX_PRIOR-1);i>=tasks.context->prior;i--) {
       k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
       for(j=0;j<MAX_TASK;j++) {                    // barro todas las tareas del grupo de prioridad
          k=(k+1)%MAX_TASK;                         // incremento modulo MAX
          switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
             case BLOCKED:                          // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].semphr==m) {    // si! me estaba esperando, le abro la puerta
+               if(tasks.list[i][k].semphr==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
                   tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
                   tasks.list[i][k].semphr = NULL;  // borro el puntero al semphr
-                  taskYield();                     // y aca esta la magia.. yo cedo el uC, porque alguien mas importante que yo o a lo sumo igual me estaba esperando para entrar al banio..
+                  taskYield();                     // y aca esta la magia.. YO cedo el uC,
+                                                   // porque alguien mas importante que yo o a
+                                                   // lo sumo igual me estaba esperando para
+                                                   // entrar al banio..
                   return true;
                }
                break;
@@ -50,5 +58,3 @@ bool mutexUnlock   ( semphr_t* m )
    }
    return false;                                   //por ahora no uso la salida de esta func.
 };
-
-
