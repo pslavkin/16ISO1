@@ -12,11 +12,11 @@ void initSystick(void)
 }
 void enableSystickIrq(void)
 {
-  SysTick->CTRL  |= SysTick_CTRL_ENABLE_Msk;
+  SysTick->CTRL  |= SysTick_CTRL_TICKINT_Msk;
 }
 void disableSystickIrq(void)
 {
-  SysTick->CTRL  &= ~SysTick_CTRL_ENABLE_Msk;
+  SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk;
 }
 
 void SysTick_Handler(void)
@@ -34,7 +34,7 @@ void SysTick_Handler(void)
 
    for (i=MAX_PRIOR;i>0;) {                // arranca buscando desde la lista de tareas de max_prior para abajo
       i--;                                 // a ver si hay alguna para pasar a ready
-      for(j=0;j<tasks.count[i];j++) {      // solo recorre las tareas habilitadas en cada prioridad
+      for(j=0;j<MAX_TASK;j++) {      // solo recorre las tareas habilitadas en cada prioridad
          switch (tasks.list[i][j].state) { // podria ser un if, pero tengo otros planes...
             case WAITING:                  // cuando agota el contador pasa a READY
                if(tasks.list[i][j].sleepTicks > 0)

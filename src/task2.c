@@ -21,11 +21,10 @@ void* task2(void* a)
 {
    uint32_t i;
    while(1) {
-      taskDelay(  5);
+      taskDelay(  200);
       gpioToggle(LED2);
       mutexLock(&semphrTask1);
-         uartWriteString( UART_USB , task2Params.name);
-         uartWriteString( UART_USB , " y si soy la 2 y largo tambien\r\n");
+         stdioPrintf(UART_USB,"nombre= %s numero= %d\r\n",tasks.context->name,tasks.context->number);
       mutexUnlock(&semphrTask1);
    }
    return NULL;

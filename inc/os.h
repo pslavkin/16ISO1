@@ -7,7 +7,7 @@
 
 #define MAX_PRIOR        10 // 10 prioridades, cada una
 #define MAX_TASK         10 // con 10 tareas
-#define MIN_STACK        30 // minimo stack para cada tarea, pero igualmente cada tarea puede
+#define MIN_STACK        300 // minimo stack para cada tarea, pero igualmente cada tarea puede
                             // elgir lo que desee
 #define TASK_NAME_LENGTH 16 // en el contexto de control tambien se guarda el nombre de fantasia.
 
@@ -39,6 +39,7 @@ typedef struct    taskContext_t {
    uint32_t       sleepTicks;             // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad
+   uint8_t        number;                 // un numero que en realidad es la posicion dentro del arreglo estatico de la prioridad en la que elgio estar
 } taskContext;
 
 //en esta estructura guardo todas las tareas y los indices.
@@ -49,7 +50,7 @@ typedef struct tasks_struct {
                                                // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                                // see. pero es rapida, facil y no indexa. my room, my rules
    uint8_t        index[ MAX_TASK];            // para cada priodidad llevo un index para saber a cual le toca luego
-   uint8_t        count[ MAX_TASK];            // para cada prioridad llevo un contador para saber cuantas
+ //  uint8_t        count[ MAX_TASK];            // para cada prioridad llevo un contador para saber cuantas
                                                // estan ocupadas. Se podria evitar comparando el campo state==EMPTY TODO
    taskContext    list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana
 } tasks_t;

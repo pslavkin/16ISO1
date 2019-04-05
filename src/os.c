@@ -60,10 +60,18 @@ bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
 
 bool taskCreate(taskParams* t, uint32_t prior)
 {
-   if(tasks.count[prior]<MAX_TASK) // controlo que no pidan mas tareas de las que entran en cada priodidad
-      return taskFill(t,&tasks.list[prior][tasks.count[prior]++],prior); 
-   else
-      return false;
+   uint8_t i;
+   for(i=0;i<MAX_TASK;i++)
+      if(tasks.list[prior][i].state==EMPTY) {
+         tasks.list[prior][i].number=i;
+         return taskFill(t,&tasks.list[prior][i],prior);
+      }
+   return false;
+}
+bool taskDelete(taskContext* c)
+{
+
+   //por ahora no puedo borrar tareas.. tampoco es un requisito por el momento..
 }
 //inicializo toda la lista de tareas para que esten todas en blanco, inicializo
 //los contadores de tareas, los estados etc.
@@ -87,14 +95,8 @@ bool initTasks(void)
   // 16bytes de stack para iniciar, porque no necesita ni un byte mas. ni bien arranque todo se
   // le asignaran los 32kb del main (o lo que sea que este configurado en el lkf
    tasks.context = &kernelContext;
-  // tarea idle, la minima priodidad de modo que se ejecuta cuando no hay otra tarea de mayor
-  // priodidad. Si un quiera tener un idle_hook por ejemplo, podria poner una tarea en
-  // priodidad cero y seria equivalente si es SCHED_FIFO
-   taskCreate ( &taskIdleParams ,0 );
-}
-bool taskDelete(taskContext* c)
-{
-   //por ahora no puedo borrar tareas.. tampoco es un requisito por el momento..
+  // tarea idle, fuera de la sabana de tareas, se ejecuta cuando no hay otra tarea en ready. 
+   taskFill(&taskIdleParams,&idleContext,0);
 }
 void triggerPendSv(void)
 {

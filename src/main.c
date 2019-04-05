@@ -18,9 +18,9 @@ int main( void )
    initPendsv ( );                 // se usa para solicitar que salte irq para el cambio de contexto
 
    initTasks  ( );                 // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
-   taskCreate ( &task2Params ,5 ); // se deja fuera la prioridad para visualizarlas aca
-   taskCreate ( &task1Params ,2 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
-   taskCreate ( &task3Params ,5 );
+   taskCreate ( &task1Params ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
+   taskCreate ( &task2Params ,1 ); // se deja fuera la prioridad para visualizarlas aca
+   taskCreate ( &task3Params ,1 );
 
    initSystick   ( );              // irq de base de tiempo
    triggerPendSv ( );              // solicita irq para que todo avance.

@@ -5,6 +5,13 @@
 #include "taskidle.h"
 
 uint32_t taskIdlePool[MIN_STACK];
+taskContext    idleContext; // la tarea Idle esta fuera de la lista estatica de
+                            // tareas, con lo cual se le asigna este contexto
+                            // sueltito para que use.  de ese modo la idle es
+                            // la tarea mas baja de todas las prioridades, de
+                            // hecho no se le pregunta la prioridad nunca, solo
+                            // se ejecuta cuando ninguna otra esta ready y el
+                            // scheduler no tien lo que hacer...
 
 taskParams taskIdleParams = {
    .name      = "taskIdle",

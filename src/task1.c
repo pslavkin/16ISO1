@@ -26,17 +26,15 @@ void* task1(void* a)
 
    while(1) {
       //      taskDelay(100);
-      for(j=0;j<10;j++) {
+      for(j=0;j<100;j++) {
          for(i=0;i<1000000;i++)
             ;
          gpioToggle(LED1);
          mutexLock(&semphrTask1);
-            uartWriteString( UART_USB , task1Params.name);
-            uartWriteString( UART_USB , " hola este es un texto laaaaargo para que tarde un bien rato \r\n");
+         stdioPrintf(UART_USB,"nombre= %s numero= %d\r\n",tasks.context->name,tasks.context->number);
          mutexUnlock(&semphrTask1);
       }
-      taskDelay(1);
-      //taskYield();
+      taskDelay(100);
    }
    return NULL;
 }

@@ -19,13 +19,11 @@ taskParams task3Params = {
 
 void* task3(void* a)
 {
-   uint32_t i;
    while(1) {
-      taskDelay( 5);
+      taskDelay( 30);
       gpioToggle(LED3);
       mutexLock(&semphrTask1);
-         uartWriteString( UART_USB , task3Params.name);
-         uartWriteString( UART_USB , "esta es la 3 y tambien es larga \r\n");
+         stdioPrintf(UART_USB,"nombre= %s numero= %d\r\n",tasks.context->name,tasks.context->number);
       mutexUnlock(&semphrTask1);
    }
    return NULL;
