@@ -22,12 +22,12 @@ taskParams taskIdleParams = {
    .hook      = hookIdle
 };
 
-void* taskIdle(void* a)
+WEAK void* taskIdle(void* a) // atributo weak para que pueda ser redefinida por el usuario sin tocar nada..
 {
    while(1) {
-      gpioToggle(LEDB); // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
-      __WFI();          // la proxima irq
-}
+      gpioToggle(LEDB);      // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
+      __WFI();               // la proxima irq
+   }
    return NULL;
 }
 void* hookIdle(void* p)

@@ -9,66 +9,46 @@
 
 bool mutexInit ( semphr_t* m )
 {
-   m->locked=false;
+   m->locked=false;  //arranca desbloqueado
+};
+//----------------------------------------------------------------------
+bool mutexLock   ( semphr_t* m ){
+   if(m->locked==false) {           // facil, si nadie lo tiene...
+      m->locked=true;               // lo tengo yo
+   }
+   else {
+      tasks.context->state=BLOCKED; // ok, ocupado..me pongo en BLOCKED (no conundor con waiting)
+      tasks.context->semphr=m;      // me guardo el puntero al semaforo que estoy esperando
+      triggerPendSv();              // y aca libero el uC, de modo que a partir de ahora soy una tarea BLOQUEAD.. y ahora? quien podra rescatarme??
+   }
 };
 
-bool mutexLock   ( semphr_t* m )
-{
-   while(m->locked==true) {
-      taskYield();
-   }
-   m->locked=true;
-}
 bool mutexUnlock   ( semphr_t* m )
 {
-   m->locked=false;
-   taskYield();
-}
-
-//----------------------------------------------------------------------
-//bool mutexLock   ( semphr_t* m ){
-//   if(m->locked==false) {
-//      m->locked=true;
-//   }
-//   else {
-//      tasks.context->state=BLOCKED;
-//      tasks.context->semphr=m;
-//      triggerPendSv();
-//   }
-//};
-
-//bool mutexUnlock   ( semphr_t* m )
-//{
-//   uint8_t i,j,k;
-//   m->locked=false;
-//   disableSystickIrq();                    // si llegara systick en el medio
-//                                           // del barrido podria cambiar los indices y generarme algun es como que
-//                                           // estariamos 2 tocando la misma tabla, para leer y escribir... mmm
-//                                           // TODO coments..
-//   for (i=MAX_PRIOR;i>0;) {                //
-//      i--;
-//      k=tasks.index[i];
-//      for(j=0;j<tasks.count[i];j++) {      // barro todas las tareas del grupo de prioridad
-//         k=(k+1)%tasks.count[i];           // incremento modulo count
-//         switch (tasks.list[i][k].state) { //
-//            case BLOCKED:                  //
-//               if(tasks.list[i][k].semphr==m) {
-//                  tasks.list[i][k].state  = READY;
-//                  tasks.list[i][k].semphr = NULL;
-//                  triggerPendSv();
-//                  enableSystickIrq(); // si goto y que!? esta hacia adelante del llamado y
-//                  uartWriteString(UART_USB,"desbloqueo\r\n");
-//                  goto end;
-//               }
-//               break;
-//            default:
-//               break;
-//         }
-//      }
-//   }
-//end:
-//  enableSystickIrq(); // si goto y que!? esta hacia adelante del llamado y
-//                         // me evito doble return o mas preguntas.
-//};
+   int8_t i,j,k;
+   m->locked=false;                                    // primero libero el mutex
+   // recorro HASTA mi misma prioridad. porque nadie de menor prioridad que yo puede interrumpirme. De modo
+   // que si yo tengo el mutex, solo alguien mas importante pudo haber intentado quitarmelo. y a esa tarea es
+   // a la que se lo doy.
+   for (i=(MAX_PRIOR-1);i>=tasks.context->prior;i--) {
+      k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;j<MAX_TASK;j++) {                    // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                         // incremento modulo MAX
+         switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED:                          // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].semphr==m) {    // si! me estaba esperando, le abro la puerta
+                  tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
+                  tasks.list[i][k].semphr = NULL;  // borro el puntero al semphr
+                  taskYield();                     // y aca esta la magia.. yo cedo el uC, porque alguien mas importante que yo o a lo sumo igual me estaba esperando para entrar al banio..
+                  return true;
+               }
+               break;
+            default:
+               break;
+         }
+      }
+   }
+   return false;                                   //por ahora no uso la salida de esta func.
+};
 
 

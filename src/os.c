@@ -70,9 +70,10 @@ bool taskCreate(taskParams* t, uint32_t prior)
 }
 bool taskDelete(taskContext* c)
 {
-
-   //por ahora no puedo borrar tareas.. tampoco es un requisito por el momento..
+   c->state=EMPTY;      //se entiende? o lo tengo que explicar??
+   return true;
 }
+
 //inicializo toda la lista de tareas para que esten todas en blanco, inicializo
 //los contadores de tareas, los estados etc.
 bool initTasks(void)
@@ -102,17 +103,22 @@ void triggerPendSv(void)
 {
    __ISB();
    __DSB();
-   SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;   //con este flag, saltra la irq pendSV inmediatamente
+   SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk; // con este flag, saltra la irq pendSV inmediatamente
 }
 bool taskDelay(uint32_t t)
 {
-   tasks.context->sleepTicks = t;         //guardo los tiks. Cuando llegue a cero pasa a READY
-   tasks.context->state      = WAITING;   //o sea si guardo 2, hace tick->1 tick->0 tick->run
-   triggerPendSv();                       //listo, llamo a cambio de contecto
+   tasks.context->sleepTicks = t;       // guardo los tiks. Cuando llegue a cero pasa a READY
+   tasks.context->state      = WAITING; // o sea si guardo 2, hace tick->1 tick->0 tick->run
+   triggerPendSv();                     // listo, llamo a cambio de contecto
 }
 bool taskYield(void)
 {
-   tasks.context->state = READY; // la tarea que llama claramente esta en running, pasa a ready
-   triggerPendSv();              // listo, llamo a cambio de contecto
+   tasks.context->state = READY;        // la tarea que llama claramente esta en running, pasa a ready
+   triggerPendSv();                     // listo, llamo a cambio de contecto
 }
 
+WEAK void* defaultHook(void* p)
+{
+   while(1)
+      ;
+};

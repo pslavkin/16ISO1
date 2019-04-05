@@ -2,12 +2,17 @@
 #include "string.h"
 #include "os.h"
 #include "sapi.h"
-#include "task1.h"
 #include "semphr.h"
+#include "task1.h"
 
+//------------------------------------------
+semphr_t printfMutex;
 
-semphr_t semphrTask1;
-
+void printfMutexInit(void)
+{
+   mutexInit(&printfMutex);
+}
+//------------------------------------------
 uint32_t task1Pool[MIN_STACK];
 
 taskParams task1Params = {
@@ -16,26 +21,25 @@ taskParams task1Params = {
    .pool_size = sizeof(task1Pool)/sizeof(task1Pool[0]),
    .param     = NULL,
    .func      = task1,
-   .hook      = hook1
+   .hook      = defaultHook,
 };
+
 
 void* task1(void* a)
 {
    uint32_t i,j;
-   mutexInit(&semphrTask1);
 
    while(1) {
-      //      taskDelay(100);
       for(j=0;j<100;j++) {
          for(i=0;i<1000000;i++)
             ;
-         gpioToggle(LED1);
-         mutexLock(&semphrTask1);
-         stdioPrintf(UART_USB,"nombre= %s numero= %d\r\n",tasks.context->name,tasks.context->number);
-         mutexUnlock(&semphrTask1);
+         gpioToggle ( LED1         );
+         mutexLock  ( &printfMutex );
+            stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
+                  tasks.context->name,tasks.context->number);
+         mutexUnlock ( &printfMutex );
       }
       taskDelay(100);
    }
    return NULL;
 }
-void* hook1(void* p) {}

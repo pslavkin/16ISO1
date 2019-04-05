@@ -5,9 +5,12 @@
 #include <stdbool.h>
 #include "semphr.h"
 
+#define WEAK __attribute__ ((weak))
+#define ALIAS(f) __attribute__ ((weak, alias (#f)))
+
 #define MAX_PRIOR        10 // 10 prioridades, cada una
 #define MAX_TASK         10 // con 10 tareas
-#define MIN_STACK        300 // minimo stack para cada tarea, pero igualmente cada tarea puede
+#define MIN_STACK        200 // minimo stack para cada tarea, pero igualmente cada tarea puede
                             // elgir lo que desee
 #define TASK_NAME_LENGTH 16 // en el contexto de control tambien se guarda el nombre de fantasia.
 
@@ -50,8 +53,6 @@ typedef struct tasks_struct {
                                                // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                                // see. pero es rapida, facil y no indexa. my room, my rules
    uint8_t        index[ MAX_TASK];            // para cada priodidad llevo un index para saber a cual le toca luego
- //  uint8_t        count[ MAX_TASK];            // para cada prioridad llevo un contador para saber cuantas
-                                               // estan ocupadas. Se podria evitar comparando el campo state==EMPTY TODO
    taskContext    list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana
 } tasks_t;
 
@@ -70,10 +71,11 @@ extern tasks_t   tasks; // y si... es global.. la uso en switcher, y en taskKern
                         // amigas.. pero escapa al objetivo del curso..Sino se podria meter os, taskKernel en on solo
                         // file y hacerme creer que es OOP... lo dejo global...
 /*==================[declaraciones de datos externos]========================*/
-bool initTasks     ( void                          );
-bool taskCreate    ( taskParams* t, uint32_t prior );
-bool taskYield     ( void                          );
-void triggerPendSv ( void                          );
-bool taskDelay     ( uint32_t t                    );
+bool  initTasks     ( void                          );
+bool  taskCreate    ( taskParams* t, uint32_t prior );
+bool  taskYield     ( void                          );
+void  triggerPendSv ( void                          );
+bool  taskDelay     ( uint32_t t                    );
+void* defaultHook   ( void*                         );
 /*==================[end of file]============================================*/
 #endif

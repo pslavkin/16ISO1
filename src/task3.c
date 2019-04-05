@@ -14,18 +14,19 @@ taskParams task3Params = {
    .pool_size = sizeof(task3Pool)/sizeof(task3Pool[0]),
    .param     = NULL,
    .func      = task3,
-   .hook      = hook3
+   .hook      = defaultHook,
 };
 
 void* task3(void* a)
 {
    while(1) {
-      taskDelay( 30);
+      taskDelay( 3);
       gpioToggle(LED3);
-      mutexLock(&semphrTask1);
-         stdioPrintf(UART_USB,"nombre= %s numero= %d\r\n",tasks.context->name,tasks.context->number);
-      mutexUnlock(&semphrTask1);
+      mutexLock  ( &printfMutex );
+         stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
+            tasks.context->name,tasks.context->number);
+      mutexUnlock ( &printfMutex );
    }
    return NULL;
 }
-void* hook3(void* p) {}
+
