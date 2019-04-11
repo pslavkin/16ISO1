@@ -17,9 +17,10 @@ int main( void )
 
    initPendsv ( );                 // se usa para solicitar que salte irq para el cambio de contexto
 
-   initPrintfMutex ( );            //inicializa un mutex para evitar que varias tareas corrompan la impresion por uart de otra0
-   initTasks       ( );            // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
-   taskCreate ( &task1Params ,2 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
+   initPrintfMutex  ( );           // inicializa un mutex para evitar que varias tareas corrompan la impresion por uart de otra0
+   initPrintfSemphr ( );
+   initTasks        ( );           // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
+   //taskCreate ( &task1Params ,2 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task2Params ,4 ); // se deja fuera la prioridad para visualizarlas aca
    taskCreate ( &task3Params ,6 );
 

@@ -33,15 +33,19 @@ bool pushTask(taskParams* t, taskContext* c)
    *(--c->sp)=0                  ; // r1  no es importante su valor
    *(--c->sp)=(uint32_t)t->param ; // r0  se puede utilizar para pasar un parametro al 1er
                                    // llamado
-   *(--c->sp)=0                  ; // r4  no es importante su valor
-   *(--c->sp)=0                  ; // r5  no es importante su valor
-   *(--c->sp)=0                  ; // r6  no es importante su valor
-   *(--c->sp)=0                  ; // r7  no es importante su valor
 
-   *(--c->sp)=0                  ; // r8  no es importante su valor
-   *(--c->sp)=0                  ; // r9  no es importante su valor
-   *(--c->sp)=0                  ; // r10 no es importante su valor
-   *(--c->sp)=0                  ; // r11 no es importante su valor
+   *(--c->sp)=0xFFFFFFF9         ; // lr
+
+   *(--c->sp)=8                  ; // r11 no es importante su valor
+   *(--c->sp)=7                  ; // r10 no es importante su valor
+   *(--c->sp)=6                  ; // r9  no es importante su valor
+   *(--c->sp)=5                  ; // r8  no es importante su valor
+
+   *(--c->sp)=3                  ; // r7  no es importante su valor
+   *(--c->sp)=2                  ; // r6  no es importante su valor
+   *(--c->sp)=1                  ; // r5  no es importante su valor
+   *(--c->sp)=0                  ; // r4  no es importante su valor
+
 }
 
 //carga en tasks que es la estructura en donde se guardan todas las tareas con

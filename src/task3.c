@@ -21,9 +21,11 @@ taskParams task3Params = {
 void* task3(void* a)
 {
    while(1) {
-      taskDelay(mseg2Ticks(30));
+      taskDelay(mseg2Ticks(3000));
       gpioToggle(LED3);
-      mutexLock  ( &printfMutex );
+//      semphrTake  ( &printfSemphr );                        // con este mutex me evito que si otra
+      semphrGive ( &printfSemphr );
+      mutexLock  ( &printfMutex  );
          stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
             tasks.context->name,tasks.context->number);
       mutexUnlock ( &printfMutex );

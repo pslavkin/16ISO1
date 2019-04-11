@@ -29,12 +29,13 @@ taskParams task2Params = {
 void* task2(void* a)
 {
    while(1) {
-      taskDelay(mseg2Ticks(200));
+      taskDelay(mseg2Ticks(20));
       gpioToggle(LED2);
-      mutexLock  ( &printfMutex );                        // con este mutex me evito que si otra
-         stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n", // tarea estaba transmitiendo una trama,
+      semphrTake  ( &printfSemphr );                        // con este mutex me evito que si otra
+//      mutexLock  ( &printfMutex );                        // con este mutex me evito que si otra
+         stdioPrintf(UART_USB,"Tarea= %s Numeroiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii= %d\r\n", // tarea estaba transmitiendo una trama,
             tasks.context->name,tasks.context->number);   // la corte.. sino que espero a que liberen
-      mutexUnlock ( &printfMutex );                       // el mutex y aho lo tomo
+ //     mutexUnlock ( &printfMutex );                       // el mutex y aho lo tomo
    }
    return NULL;
 }

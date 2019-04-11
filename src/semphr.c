@@ -14,7 +14,7 @@ bool mutexInit ( semphr_t* m )
 //----------------------------------------------------------------------
 bool mutexLock   ( semphr_t* m ){
    if(m->locked==false) {           // facil, si nadie lo tiene...
-      m->locked=true;               // lo tengo yo
+     m->locked=true;               // lo tengo yo
    }
    else {
       tasks.context->state=BLOCKED; // ok, ocupado..me pongo en BLOCKED (no conundor con waiting)
@@ -58,3 +58,21 @@ bool mutexUnlock   ( semphr_t* m )
    }
    return false;                                   //por ahora no uso la salida de esta func.
 };
+
+
+
+bool semphrInit ( semphr_t* s )
+{
+   s->locked=true;  //arranca tomado, a diferencia del mutex.
+};
+//----------------------------------------------------------------------
+bool semphrTake   ( semphr_t* s )
+{
+   return mutexLock(s);
+}
+bool semphrGive   ( semphr_t* s )
+{
+   return mutexUnlock(s);
+};
+
+

@@ -11,10 +11,15 @@
 //de las tareas haciendolo ectern en el .h, pero el lugar correcto para
 //definirlo seria en algun file relacionado con la transmision por uart
 semphr_t printfMutex;
+semphr_t printfSemphr;
 
 void initPrintfMutex(void)
 {
    mutexInit(&printfMutex);
+}
+void initPrintfSemphr(void)
+{
+   semphrInit(&printfSemphr);
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
@@ -45,7 +50,7 @@ void* task1(void* a)
                   tasks.context->name,tasks.context->number);
          mutexUnlock ( &printfMutex );
       }
-      taskDelay(mseg2Ticks(1000));
+      taskDelay  ( mseg2Ticks(1000 ));
    }
    return NULL;
 }

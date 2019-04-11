@@ -14,7 +14,7 @@ taskContext    kernelContext;
 
 //en el 1er salto, el sp se pisa con el del main... que tiene 32k, por eso solo
 //uso 16 bytes para el 1er llenado de datos al inicio.
-uint32_t       taskKernelPool[16];
+uint32_t       taskKernelPool[100];
 
 taskParams taskKernelParams = {
    .name      = "taskKernel",
@@ -52,6 +52,13 @@ void* taskKernel(void* p)
             case READY:                                        // la primera que este READY
                tasks.context = &tasks.list[i][tasks.index[i]]; // actualizo el index
                goto end;                                       // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
+//            case BLOCKED:                          // aja, encontre una..veamos si me esta esperando...
+//               if(tasks.list[i][tasks.index[i]].semphr!=NULL &&
+//                  tasks.list[i][tasks.index[i]].semphr->locked==false) {
+//                  tasks.context = &tasks.list[i][tasks.index[i]]; // actualizo el index
+//                  tasks.list[i][tasks.index[i]].semphr = NULL;  // borro el puntero al semphr
+//               }
+//               goto end;                                       // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
             default:
                break;
          }
