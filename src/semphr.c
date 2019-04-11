@@ -44,6 +44,7 @@ bool mutexUnlock   ( semphr_t* m )
                if(tasks.list[i][k].semphr==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
                   tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
                   tasks.list[i][k].semphr = NULL;  // borro el puntero al semphr
+                  m->locked               = true;  // lo tengo yo
                   taskYield();                     // y aca esta la magia.. YO cedo el uC,
                                                    // porque alguien mas importante que yo o a
                                                    // lo sumo igual me estaba esperando para

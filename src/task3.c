@@ -21,7 +21,7 @@ taskParams task3Params = {
 void* task3(void* a)
 {
    while(1) {
-      taskDelay(mseg2Ticks(3000));
+      taskDelay(mseg2Ticks(1000));
       gpioToggle(LED3);
 //      semphrTake  ( &printfSemphr );                        // con este mutex me evito que si otra
       semphrGive ( &printfSemphr );

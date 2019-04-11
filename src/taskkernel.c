@@ -50,15 +50,16 @@ void* taskKernel(void* p)
 #endif
          switch (tasks.list[i][tasks.index[i]].state) {        // podria hacer un if pero tego otros planes luego
             case READY:                                        // la primera que este READY
-               tasks.context = &tasks.list[i][tasks.index[i]]; // actualizo el index
-               goto end;                                       // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
-//            case BLOCKED:                          // aja, encontre una..veamos si me esta esperando...
-//               if(tasks.list[i][tasks.index[i]].semphr!=NULL &&
-//                  tasks.list[i][tasks.index[i]].semphr->locked==false) {
-//                  tasks.context = &tasks.list[i][tasks.index[i]]; // actualizo el index
-//                  tasks.list[i][tasks.index[i]].semphr = NULL;  // borro el puntero al semphr
-//               }
-//               goto end;                                       // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
+               tasks.context = &tasks.list[i][tasks.index[i]];         // actualizo el index
+               goto end;                                               // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
+            case BLOCKED:                                              // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][tasks.index[i]].semphr!=NULL &&
+                  tasks.list[i][tasks.index[i]].semphr->locked==false) {
+                     tasks.list[i][tasks.index[i]].semphr->locked = true;
+                     tasks.list[i][tasks.index[i]].semphr         = NULL; // borro el puntero al semphr
+                     tasks.context = &tasks.list[i][tasks.index[i]];      // actualizo el index
+                     goto end;                                            // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
+               }
             default:
                break;
          }
