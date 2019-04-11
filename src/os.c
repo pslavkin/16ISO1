@@ -36,10 +36,10 @@ bool pushTask(taskParams* t, taskContext* c)
 
    *(--c->sp)=0xFFFFFFF9         ; // lr
 
-   *(--c->sp)=8                  ; // r11 no es importante su valor
-   *(--c->sp)=7                  ; // r10 no es importante su valor
-   *(--c->sp)=6                  ; // r9  no es importante su valor
-   *(--c->sp)=5                  ; // r8  no es importante su valor
+   *(--c->sp)=7                  ; // r11 no es importante su valor
+   *(--c->sp)=5                  ; // r10 no es importante su valor
+   *(--c->sp)=5                  ; // r9  no es importante su valor
+   *(--c->sp)=4                  ; // r8  no es importante su valor
 
    *(--c->sp)=3                  ; // r7  no es importante su valor
    *(--c->sp)=2                  ; // r6  no es importante su valor

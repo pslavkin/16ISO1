@@ -8,7 +8,7 @@
 
 PendSV_Handler:
 
-   tst  lr,0x00000010       // equivale a lr & 0x00000010 para ver si esta prendido este but
+   tst  lr,0x10       // equivale a lr & 0x00000010 para ver si esta prendido este but
    it eq                    // si es cero (mira el bit z del registro de control)
    vpusheq {s16-s31}        // al ejec
 
@@ -27,9 +27,9 @@ PendSV_Handler:
    ldr  sp ,[r5]            // lo que sea, tomo lo que apunta y le mando el sp
    pop  {r4-r11,lr}         // listo, saco los registros no autmaticos
 
-   tst  lr,0x00000010       // equivale a lr & 0x00000010 para ver si esta prendido este but
+   tst  lr,0x10       // equivale a lr & 0x00000010 para ver si esta prendido este but
    it eq                    // si es cero (mira el bit z del registro de control)
-   vpusheq {s16-s31}        // al ejec
+   vpopeq {s16-s31}        // al ejec
 
    bx   lr                  // y ahora si, como lr es 0xFFFFFFF9 popea el resto de los registros y sigue desde el PC que popeara
 
