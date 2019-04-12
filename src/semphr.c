@@ -10,7 +10,7 @@
 bool semphrInit ( semphr_t* s, uint32_t count )
 {
    s->count = 0;     // arranca tomado, a diferencia del mutex.
-   s->max   = count; // cantidad maxima de gives.. 
+   s->max   = count; // cantidad maxima de gives..
 };
 //----------------------------------------------------------------------
 bool semphrTake   ( semphr_t* m ){

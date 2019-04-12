@@ -5,8 +5,8 @@
 #include <stdbool.h>
 
 typedef struct    semphr_struct {   //ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
-   uint32_t count;
-   uint32_t max;
+   uint32_t count;      //lleva cuenta de cuantos gives se hicieron
+   uint32_t max;        //maximo de gives admitidos
 } semphr_t;
 
 bool mutexInit   ( semphr_t* m );

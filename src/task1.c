@@ -19,7 +19,7 @@ void initPrintfMutex(void)
 }
 void initPrintfSemphr(void)
 {
-   semphrInit(&printfSemphr,2);
+   semphrInit(&printfSemphr,5);
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
@@ -39,27 +39,32 @@ void* task1(void* a)
    uint32_t firstTick,diff;
 
    while(1) {
-      if ( gpioRead( TEC1 )==0) {
-         firstTick=getTicks();
-         gpioWrite ( LED1,true    );
+      semphrTake ( &printfSemphr );
          mutexLock ( &printfMutex );
-         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton Tec1\r\n",
+         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
                tasks.context->name,tasks.context->number);
          mutexUnlock ( &printfMutex );
-         while(gpioRead(TEC1)==0)
-            taskDelay(mseg2Ticks(50));
-         diff=deltaTick(firstTick);
-         gpioWrite(LEDG,true);
-         stdioPrintf(UART_USB,"delay=%d\r\n",diff);
-         taskDelay(diff);
-         gpioWrite(LEDG,false);
-
-         semphrGive ( &printfSemphr,2 );
-      }
-        else {
-            taskDelay(mseg2Ticks(50));
-        }
-
+         taskDelay(mseg2Ticks(10));
    }
+//      if ( gpioRead( TEC1 )==0) {
+//         firstTick=getTicks();
+//         gpioWrite ( LED1,true    );
+//         mutexLock ( &printfMutex );
+//         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton Tec1\r\n",
+//               tasks.context->name,tasks.context->number);
+//         mutexUnlock ( &printfMutex );
+//         while(gpioRead(TEC1)==0)
+//            taskDelay(mseg2Ticks(50));
+//         diff=deltaTick(firstTick);
+//         gpioWrite(LEDG,true);
+//         stdioPrintf(UART_USB,"delay=%d\r\n",diff);
+//         taskDelay(diff);
+//         gpioWrite(LEDG,false);
+//      }
+//         mutexLock ( &printfMutex );
+//         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
+//               tasks.context->name,tasks.context->number);
+//         mutexUnlock ( &printfMutex );
+//   }
    return NULL;
 }

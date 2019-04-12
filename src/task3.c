@@ -20,33 +20,34 @@ taskParams task3Params = {
 
 void* task3(void* a)
 {
+   uint8_t buf;
    while(1) {
-      taskDelay(mseg2Ticks(1000));
-      gpioToggle ( LED3          );
-      semphrTake ( &printfSemphr ); // con este mutex me evito que si otra
       mutexLock  ( &printfMutex  );
-      stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
-            tasks.context->name,tasks.context->number);
+      //stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
+      //      tasks.context->name,tasks.context->number);
       stdioPrintf(UART_USB,"Ingrese codigo\r\n");
       mutexUnlock ( &printfMutex );
  
-      uint8_t buf;
-      while(uartReadByte( UART_USB, &buf)==false)
-         ;
+      while(uartReadByte( UART_USB, &buf)==false) {
+         taskDelay(mseg2Ticks(100));
+         }
       switch (buf) {
          case '1':
             mutexLock  ( &printfMutex  );
             stdioPrintf(UART_USB,"operacion 1\r\n");
+            semphrGive(&printfSemphr,1);
             mutexUnlock ( &printfMutex );
             break;
          case '2':
             mutexLock  ( &printfMutex  );
             stdioPrintf(UART_USB,"operacion 2\r\n");
+            semphrGive(&printfSemphr,2);
             mutexUnlock ( &printfMutex );
             break;
          case '3':
             mutexLock  ( &printfMutex  );
             stdioPrintf(UART_USB,"operacion 3\r\n");
+            semphrGive(&printfSemphr,3);
             mutexUnlock ( &printfMutex );
             break;
          default:

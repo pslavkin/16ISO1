@@ -10,7 +10,7 @@
 
 #define MAX_PRIOR        10  // 10 prioridades, cada una
 #define MAX_TASK         10  // con 10 tareas
-#define MIN_STACK        200 // minimo stack para cada tarea, pero igualmente cada tarea puede
+#define MIN_STACK        400 // minimo stack para cada tarea, pero igualmente cada tarea puede
                              // elgir lo que desee
 #define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.
 
