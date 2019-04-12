@@ -19,7 +19,7 @@ void initPrintfMutex(void)
 }
 void initPrintfSemphr(void)
 {
-   semphrInit(&printfSemphr,5);
+   semphrInit(&printfSemphr,250);
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
@@ -40,11 +40,13 @@ void* task1(void* a)
 
    while(1) {
       semphrTake ( &printfSemphr );
-         mutexLock ( &printfMutex );
-         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
-               tasks.context->name,tasks.context->number);
-         mutexUnlock ( &printfMutex );
-         taskDelay(mseg2Ticks(10));
+      gpioToggle(LED1);
+      mutexLock ( &printfMutex );
+      stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
+            tasks.context->name,tasks.context->number);
+      mutexUnlock ( &printfMutex );
+//         taskDelay(mseg2Ticks(10));
+
    }
 //      if ( gpioRead( TEC1 )==0) {
 //         firstTick=getTicks();

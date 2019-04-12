@@ -42,7 +42,7 @@ void* task2(void* a)
          stdioPrintf(UART_USB,"Tarea= %s Numero= %d pi=%d\r\n", // tarea estaba transmitiendo una trama,
             tasks.context->name,tasks.context->number, p);      // la corte.. sino que espero a que liberen
       mutexUnlock ( &printfMutex );                             // el mutex y aho lo tomo
-      taskDelay(mseg2Ticks(10));
+//      taskDelay(mseg2Ticks(10));
    }
    return NULL;
 }

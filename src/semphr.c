@@ -27,6 +27,7 @@ bool semphrTake   ( semphr_t* m ){
 bool semphrGive   ( semphr_t* m , uint32_t qty)
 {
    int8_t i,j,k;
+   bool yield=false;
    if(m->count<m->max) {            //si hay al menos un lugar, arranco
       if((m->count+qty)<m->max)     //si puedo dar todos los que me pidio, lo hago
          m->count+=qty;
@@ -35,21 +36,18 @@ bool semphrGive   ( semphr_t* m , uint32_t qty)
       // recorro HASTA mi misma prioridad. porque nadie de menor prioridad que yo
       // puede interrumpirme. Si es menor y quiere el semaforo tendra que esperar al 
       // dispatcher para que lo consulte.
-      for (i=(MAX_PRIOR-1);i>=tasks.context->prior;i--) {
+      for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {
          k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
-         for(j=0;j<MAX_TASK;j++) {                    // barro todas las tareas del grupo de prioridad
+         for(j=0;m->count>0 && j<MAX_TASK;j++) {                    // barro todas las tareas del grupo de prioridad
             k=(k+1)%MAX_TASK;                         // incremento modulo MAX
             switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
                case BLOCKED:                          // aja, encontre una..veamos si me esta esperando...
                   if(tasks.list[i][k].semphr==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
-                     tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
+                     tasks.list[i][k].state  = READY;// aviso que esta taera pasa a ready
                      tasks.list[i][k].semphr = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
-                     m->count--;                      // no hace falta preguntar por mayor a cero porque si estoy aca es porque al inicio incremente en uno el count 
-                     taskYield();                     // y aca esta la magia.. YO cedo el uC,
-                     // porque alguien mas importante que yo o a
-                     // lo sumo igual me estaba esperando para
-                     // entrar al banio..
-                     return true;
+                     m->count--;                      //decremento en uno el numero de semaforos
+                     if(i>=tasks.context->prior)      //si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                        yield = true;                 //aviso que voy a hacer yield, cuando termine de desbloquear todo
                   }
                   break;
                default:
@@ -58,7 +56,10 @@ bool semphrGive   ( semphr_t* m , uint32_t qty)
          }
       }
    }
-   return false;                                   //por ahora no uso la salida de esta func.
+end:
+   if(yield==true)
+      taskYield();
+   return yield;                                   //por ahora no uso la salida de esta func.
 };
 
 //----------------------------------------------------------------------
