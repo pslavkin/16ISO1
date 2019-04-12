@@ -36,21 +36,30 @@ taskParams task1Params = {
 void* task1(void* a)
 {
    uint32_t i,j;
+   uint32_t firstTick,diff;
 
    while(1) {
-//pongo esta tarea a consumir uC sin parar para probar cuestiones de
-//prioridades y que el scheduler le haga o no el preemptive y probara tambien
-//lo de SCHED_RR y SCHED_FIFO
-      for(j=0;j<100;j++) {
-         for(i=0;i<1000000;i++)
-            ;
-         gpioToggle ( LED1         );
-         mutexLock  ( &printfMutex );
-            stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
-                  tasks.context->name,tasks.context->number);
+      if ( gpioRead( TEC1 )==0) {
+         firstTick=getTicks();
+         gpioWrite ( LED1,true    );
+         mutexLock ( &printfMutex );
+         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton Tec1\r\n",
+               tasks.context->name,tasks.context->number);
          mutexUnlock ( &printfMutex );
+         while(gpioRead(TEC1)==0)
+            taskDelay(mseg2Ticks(50));
+         diff=deltaTick(firstTick);
+         gpioWrite(LEDG,true);
+         stdioPrintf(UART_USB,"delay=%d\r\n",diff);
+         taskDelay(diff);
+         gpioWrite(LEDG,false);
+         
+         semphrGive ( &printfSemphr );
       }
-      taskDelay  ( mseg2Ticks(1000 ));
+        else {
+            taskDelay(mseg2Ticks(50));
+        }
+
    }
    return NULL;
 }

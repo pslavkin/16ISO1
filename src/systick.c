@@ -42,3 +42,22 @@ void SysTick_Handler(void)
    }
    triggerPendSv();                                // listo, hora de llamar al kernel para que despache la tarea que toque
 }
+
+
+uint32_t getTicks(void)
+{
+   return tick;
+}
+uint32_t deltaTick(uint32_t first)
+{
+   return diffTicks(first,getTicks());
+}
+uint32_t diffTicks(uint32_t first, uint32_t second)
+{
+   uint32_t diff;
+   if(second>first)
+      diff=second-first;
+   else
+      diff=first-second;
+   return diff;
+}

@@ -38,12 +38,11 @@ void* task2(void* a)
       pi/=2;
       if(pi>10) p=100;
       else p=200;
-      semphrTake  ( &printfSemphr );                        // con este mutex me evito que si otra
-//      mutexLock  ( &printfMutex );                        // con este mutex me evito que si otra
+      semphrTake ( &printfSemphr );                             // con este mutex me evito que si otra
+      mutexLock  ( &printfMutex  );                             // con este mutex me evito que si otra
          stdioPrintf(UART_USB,"Tarea= %s Numero= %d pi=%d\r\n", // tarea estaba transmitiendo una trama,
-            tasks.context->name,tasks.context->number,
-            p);                                                // la corte.. sino que espero a que liberen
- //     mutexUnlock ( &printfMutex );                       // el mutex y aho lo tomo
+            tasks.context->name,tasks.context->number, p);      // la corte.. sino que espero a que liberen
+      mutexUnlock ( &printfMutex );                             // el mutex y aho lo tomo
    }
    return NULL;
 }
