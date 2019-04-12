@@ -4,7 +4,7 @@
 #include "os.h"
 #include "sapi.h"
 
-uint32_t tick = 0;     //aun no lo estoy usando pero es un contador de ticks multiuso
+uint32_t tick = 0;     //cuenta con cada tick irq indefinidamente y la uso para calcular tiempos
 
 //agrego funciones para prender y apagar la irq del systick. Las uso antes de
 //entrar al taskKernel para evitar race condition contra tasks.list. Es una
@@ -43,21 +43,21 @@ void SysTick_Handler(void)
    triggerPendSv();                                // listo, hora de llamar al kernel para que despache la tarea que toque
 }
 
-
+//---------------------------------------------------------------------------------------
 uint32_t getTicks(void)
 {
-   return tick;
-}
-uint32_t deltaTick(uint32_t first)
-{
-   return diffTicks(first,getTicks());
+   return tick;                        // no mucho para decir, me devuelve la cantdad de ticks que cuenta con el sistick
 }
 uint32_t diffTicks(uint32_t first, uint32_t second)
 {
-   uint32_t diff;
+   uint32_t diff;                      // dificilmente pegue una vuelta, pero por las dudas controlo y defuelvo la diff
    if(second>first)
       diff=second-first;
    else
       diff=first-second;
    return diff;
+}
+uint32_t deltaTick(uint32_t first)
+{
+   return diffTicks(first,getTicks()); // le paso un tiempo inicial y me da la diferencia con el tiempo actual
 }

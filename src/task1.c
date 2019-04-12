@@ -19,7 +19,7 @@ void initPrintfMutex(void)
 }
 void initPrintfSemphr(void)
 {
-   semphrInit(&printfSemphr);
+   semphrInit(&printfSemphr,2);
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
@@ -53,8 +53,8 @@ void* task1(void* a)
          stdioPrintf(UART_USB,"delay=%d\r\n",diff);
          taskDelay(diff);
          gpioWrite(LEDG,false);
-         
-         semphrGive ( &printfSemphr );
+
+         semphrGive ( &printfSemphr,2 );
       }
         else {
             taskDelay(mseg2Ticks(50));
