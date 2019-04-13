@@ -5,10 +5,12 @@
 /*==================[tipos de datos declarados por el usuario]===============*/
 extern semphr_t   printfMutex;
 extern semphr_t   printfSemphr;
+extern semphr_t   printfQueue;
 extern taskParams task1Params;
 /*==================[declaraciones de datos externos]========================*/
 void  initPrintfMutex  ( void    );
 void  initPrintfSemphr ( void    );
+void  initPrintfQueue  ( void    );
 void* task1            ( void* a );
 void* hook1            ( void* p );
 /*==================[end of file]============================================*/

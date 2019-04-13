@@ -45,10 +45,16 @@ void* task3(void* a)
             mutexUnlock ( &printfMutex );
             break;
          case '3':
-            mutexLock  ( &printfMutex  );
-            stdioPrintf(UART_USB,"operacion 3\r\n");
-            semphrGive(&printfSemphr,3);
-            mutexUnlock ( &printfMutex );
+            {
+            uint8_t data[30];
+            sprintf(data,"op3 tick=%d\r\n",getTicks());
+            queueWrite  ( &printfQueue,data );
+            sprintf(data,"op3 tick=%d\r\n",getTicks());
+            queueWrite  ( &printfQueue,data );
+            mutexLock   ( &printfMutex                   );
+            stdioPrintf ( UART_USB,"operacion 3\r\n"     );
+            mutexUnlock ( &printfMutex                   );
+            }
             break;
          default:
             mutexLock  ( &printfMutex  );

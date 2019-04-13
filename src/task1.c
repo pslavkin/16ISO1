@@ -12,6 +12,10 @@
 //definirlo seria en algun file relacionado con la transmision por uart
 semphr_t printfMutex;
 semphr_t printfSemphr;
+semphr_t printfQueue;
+
+circularBuffer_t cb;
+uint8_t cbPool[11*30];
 
 void initPrintfMutex(void)
 {
@@ -20,6 +24,11 @@ void initPrintfMutex(void)
 void initPrintfSemphr(void)
 {
    semphrInit(&printfSemphr,250);
+}
+void initPrintfQueue(void)
+{
+   circularBuffer_Init ( &cb,cbPool,10,30 );
+   queueInit           ( &printfQueue,&cb );
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
@@ -37,13 +46,15 @@ void* task1(void* a)
 {
    uint32_t i,j;
    uint32_t firstTick,diff;
+   uint8_t data[30];
 
    while(1) {
-      semphrTake ( &printfSemphr );
+      queueRead( &printfQueue, data );
       gpioToggle(LED1);
       mutexLock ( &printfMutex );
       stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
             tasks.context->name,tasks.context->number);
+      stdioPrintf(UART_USB,"%s",data);
       mutexUnlock ( &printfMutex );
 //         taskDelay(mseg2Ticks(10));
 

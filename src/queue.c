@@ -7,10 +7,10 @@
 #include "systick.h"
 #include "queue.h"
 
-bool queueInit ( queue_t* m )
-{
-   m->locked=false;  //arranca desbloqueado
-};
+//bool queueInit ( queue_t* m )
+//{
+//   m->locked=false;  //arranca desbloqueado
+//};
 //----------------------------------------------------------------------
 //bool mutexLock   ( semphr_t* m ){
 //   if(m->locked==false) {           // facil, si nadie lo tiene...
