@@ -7,6 +7,8 @@
 #include "queue.h"
 #include "systick.h"
 #include "task1.h"
+#include "taskprint.h"
+#include "stat.h"
 
 //------------------------------------------
 //defino por ahora en esta tarea mi primer mutex que lo comparto con el resto
@@ -26,7 +28,7 @@ void initPrintfSemphr(void)
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];
 
-taskParams task1Params = {
+taskParams_t task1Params = {
    .name      = "task1",
    .pool      = task1Pool,
    .pool_size = sizeof(task1Pool)/sizeof(task1Pool[0]),
@@ -41,36 +43,8 @@ void* task1(void* a)
    uint32_t firstTick,diff;
 
    while(1) {
-      taskBlock();
       semphrTake( &printfSemphr );
-      taskDelay(mseg2Ticks(100));
       gpioToggle(LED1);
-      mutexLock ( &printfMutex );
-      stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
-            tasks.context->name,tasks.context->number);
-      mutexUnlock ( &printfMutex );
-//         taskDelay(mseg2Ticks(10));
-
    }
-//      if ( gpioRead( TEC1 )==0) {
-//         firstTick=getTicks();
-//         gpioWrite ( LED1,true    );
-//         mutexLock ( &printfMutex );
-//         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton Tec1\r\n",
-//               tasks.context->name,tasks.context->number);
-//         mutexUnlock ( &printfMutex );
-//         while(gpioRead(TEC1)==0)
-//            taskDelay(mseg2Ticks(50));
-//         diff=deltaTick(firstTick);
-//         gpioWrite(LEDG,true);
-//         stdioPrintf(UART_USB,"delay=%d\r\n",diff);
-//         taskDelay(diff);
-//         gpioWrite(LEDG,false);
-//      }
-//         mutexLock ( &printfMutex );
-//         stdioPrintf(UART_USB,"Tarea= %s Numero= %d Boton NO Tec1\r\n",
-//               tasks.context->name,tasks.context->number);
-//         mutexUnlock ( &printfMutex );
-//   }
    return NULL;
 }

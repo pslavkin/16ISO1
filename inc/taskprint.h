@@ -5,10 +5,10 @@
 #define MAX_MSG_LENGTH 80
 
 extern queue_t    printQueue;
-extern taskParams taskPrintParams;
+extern taskParams_t taskPrintParams;
 
-void  initPrintQueue ( void    );
-void* taskPrint      ( void* a );
-void* hookPrint      ( void* p );
+void  initPrintQueue  ( void            );
+void* taskPrint       ( void* a         );
+void* hookPrint       ( void* p         );
 
 #endif

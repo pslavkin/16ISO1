@@ -5,18 +5,19 @@
 #include "systick.h"
 #include "taskkernel.h"
 #include "taskidle.h"
+#include "stat.h"
 
 //la tarea kernel se mantiene fuera de tasks que es la lista de tareeas de
 //usuario, pero tiene las mismas cualidades que el resto de las tareas, aunque
 //algunas sobran, se unifica porque mejora la lectura del codigo y se
 //aprovechan todas las funciones
-taskContext    kernelContext;
+taskContext_t  kernelContext;
 
 //en el 1er salto, el sp se pisa con el del main... que tiene 32k, por eso solo
 //uso 16 bytes para el 1er llenado de datos al inicio.
 uint32_t       taskKernelPool[100];
 
-taskParams taskKernelParams = {
+taskParams_t taskKernelParams = {
    .name      = "taskKernel",
    .pool      = taskKernelPool,
    .pool_size = sizeof(taskKernelPool)/sizeof(taskKernelPool[0]),
@@ -42,7 +43,12 @@ void* taskKernel(void* p)
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
    disableSystickIrq();                                        // como systick husmea en mi lista de tareas, le pido que espere a que termine antes de que salte
-
+#if STAT_ENABLE==1                                             // si es RR, PRIMERO incremento, con lo cual la que fue interrumpida pasa a ser la ultima en la busqueda rounrobin
+   stampWaterMark ( tasks.context  );                          // funciones de estadisticas, utlies para debug
+   stampRunCount  ( tasks.context  );
+   stampWaterMark ( &kernelContext );
+   stampRunCount  ( &kernelContext );
+#endif
    for (i=(MAX_PRIOR-1);i>=0;i--) {                            // arranca siempre desde la maxima prioridad
       for(j=0;j<MAX_TASK;j++) {                                // barro todas las tareas del grupo de prioridad
 #if SCHED_FIFO_RR==0                                           // si es RR, PRIMERO incremento, con lo cual la que fue interrumpida pasa a ser la ultima en la busqueda rounrobin
@@ -66,7 +72,7 @@ end:
    enableSystickIrq();                                         // habilito d nuevo el systick
 }
 //-----------------------------------------------------------------------
-bool freeBlockedGived   ( event_t* m)           // cuando se hace un take, libera las tareas esperando un give
+bool freeBlockedGived   ( event_t* m)              // cuando se hace un take, libera las tareas esperando un give
 {
    int8_t i,j,k;
    for (i=(MAX_PRIOR-1);i>=0;i--) {                // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
@@ -75,8 +81,8 @@ bool freeBlockedGived   ( event_t* m)           // cuando se hace un take, liber
          k=(k+1)%MAX_TASK;                         // incremento modulo MAX
          switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
             case BLOCKED_GIVE:                     // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].event==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
-                  tasks.list[i][k].event = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+               if(tasks.list[i][k].event==m) {     // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  tasks.list[i][k].event = NULL;   // TODO: no se si hace falta..borro el puntero al semphr
                   tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
                   if(i>=tasks.context->prior)      // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
                      return true;                  // aviso que voy a hacer yield, cuando termine de desbloquear todo
@@ -89,7 +95,7 @@ bool freeBlockedGived   ( event_t* m)           // cuando se hace un take, liber
    }
    return false;
 }
-bool freeBlockedTaked   ( event_t* m)          // cuando se hace el give, libera las tareas esperando un take
+bool freeBlockedTaked   ( event_t* m)              // cuando se hace el give, libera las tareas esperando un take
 {
    bool yield=false;
    int8_t i,j,k;
@@ -99,9 +105,9 @@ bool freeBlockedTaked   ( event_t* m)          // cuando se hace el give, libera
          k=(k+1)%MAX_TASK;                         // incremento modulo MAX
          switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
             case BLOCKED_TAKE:                     // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].event==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+               if(tasks.list[i][k].event==m) {     // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
                   m->count--;                      // decremento en uno el numero de semaforos
-                  tasks.list[i][k].event = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].event = NULL;   // TODO: no se si hace falta..borro el puntero al semphr
                   tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
                   if(i>=tasks.context->prior)      // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
                      yield = true;                 // aviso que voy a hacer yield, cuando termine de desbloquear todo
@@ -112,6 +118,6 @@ bool freeBlockedTaked   ( event_t* m)          // cuando se hace el give, libera
          }
       }
    }
-   return yield;                                   //por ahora no uso la salida de esta func.
+   return yield;                                   // por ahora no uso la salida de esta func.
 }
 

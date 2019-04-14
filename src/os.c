@@ -21,7 +21,7 @@ tasks_t  tasks; // aca defino la lista estatica de todas las tareas posibles de 
 //cual en el taskSwitch se hace un doble cambio de contexto, primero se cambia
 //de la runningTask a kernelTask y luego de kernelTask a la tarea elegida.  de
 //esta manera se usa el stack de cada quien para cada cual.
-bool pushTask(taskParams* t, taskContext* c)
+bool pushTask(taskParams_t* t, taskContext_t* c)
 {
    *(--c->sp)=1<<24              ; // PSR modo thumb
    *(--c->sp)=(uint32_t)t->func  ; // PC  funcion que 'esta' corriendo
@@ -50,7 +50,7 @@ bool pushTask(taskParams* t, taskContext* c)
 
 //carga en tasks que es la estructura en donde se guardan todas las tareas con
 //los parametros que se pasan. el nombre, la prioridad, etc.
-bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
+bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
 {
       c->pool       = t->pool;                  //puntero al stack que usara la tarea
       c->sp         = &t->pool[t->pool_size];   //pntero al FINAL del stack
@@ -62,7 +62,7 @@ bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
       return true;                              //TODO por ahora siempre funciona.. peeero
 }
 
-bool taskCreate(taskParams* t, uint32_t prior)
+bool taskCreate(taskParams_t* t, uint32_t prior)
 {
    uint8_t i;
    for(i=0;i<MAX_TASK;i++)
@@ -72,7 +72,7 @@ bool taskCreate(taskParams* t, uint32_t prior)
       }
    return false;
 }
-bool taskDelete(taskContext* c)
+bool taskDelete(taskContext_t* c)
 {
    c->state=EMPTY;      //se entiende? o lo tengo que explicar??
    return true;
@@ -86,10 +86,11 @@ bool initTasks(void)
 
    for(i=0;i<MAX_PRIOR;i++) {
       for(j=0;j<MAX_TASK;j++) {
-         tasks.list[i][j].state=EMPTY; // no lo estoy usando, pero quede bien indicar que el
-                                       // casillero esta vacio
+         tasks.list[i][j].state     = EMPTY;      // arranca en EMPTY que se interpreta como hueco en la lista de tareas, se puede usar para meter una tarea on run-time
+         tasks.list[i][j].waterMark = 0x7FFFFFFF; // defino un stack imposible para que en el primer estampado se pise con el valor real. 
+         tasks.list[i][j].runCount  = 0;          // numero de veces que corrio.
       }
-      tasks.index[i] = 0;              // arranco desde la 1er tarea de cada priodidadd
+      tasks.index[i] = 0;                         // arranco desde la 1er tarea de cada priodidadd
    }
   // si, el kernel tambien es una tarea, aunque no esta en la lista de tareas  de tasks..
   // tiene su estructura aparte, pero los mismos parametros.
@@ -131,3 +132,7 @@ WEAK void* defaultHook(void* p)
    while(1)
       ;
 };
+void* fakeFun(void* p)  //la uso para enganiar al compilador para que no optimice algunas variables.. solo para debug
+{
+};
+

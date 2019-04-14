@@ -4,9 +4,9 @@
 #include "semphr.h"
 #include "queue.h"
 /*==================[tipos de datos declarados por el usuario]===============*/
-extern semphr_t   printfMutex;
-extern semphr_t   printfSemphr;
-extern taskParams task1Params;
+extern semphr_t     printfMutex;
+extern semphr_t     printfSemphr;
+extern taskParams_t task1Params;
 /*==================[declaraciones de datos externos]========================*/
 void  initPrintfMutex  ( void    );
 void  initPrintfSemphr ( void    );

@@ -35,41 +35,43 @@ enum taskState{
 //pool para poder validar que no pise el stack de otro, el estado, los ticks y cualquier otra
 //cosa que surja luego relacionado con la tarea, este seria el lugar. cada tarea tiene una de
 //estas y se llena con taskCreate
-typedef struct    taskContext_t {
+typedef struct    taskContext_struct {
    uint32_t*      sp;                     // DANGER.. este campo tiene que ir PRIMERO, porque lo uso en ASM y no
                                           // quiero indexar para no perder tiempo, asi que el nombre de la variable de este tipo, es
                                           // tambien su sp.. propenso a errores? puede ser, mala programacion? ponele, es peor que un
                                           // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                           // see. pero es rapida, facil y no indexa. my room, my rules
    uint32_t*      pool;                   // puntero al inicio del stack (no al final) por el final arranca sp
+   int32_t        waterMark;   //TODO: comentar
+   uint32_t       runCount;   // TODO
    enum taskState state;                  // running, waiting, etc.
    event_t*       event;                  // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
    uint32_t       sleep;             // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad
    uint8_t        number;                 // un numero que en realidad es la posicion dentro del arreglo estatico de la prioridad en la que elgio estar
-} taskContext;
+} taskContext_t;
 
 //en esta estructura guardo todas las tareas y los indices.
 typedef struct tasks_struct {
-   taskContext    *context;                    // DANGER.. este campo tiene que ir PRIMERO, porque lo uso en ASM y no
+   taskContext_t  *context;                    // DANGER.. este campo tiene que ir PRIMERO, porque lo uso en ASM y no
                                                // quiero indexar para no perder tiempo, asi que el nombre de la variable de este tipo, es
                                                // tambien su sp.. propenso a errores? puede ser, mala programacion? ponele, es peor que un
                                                // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                                // see. pero es rapida, facil y no indexa. my room, my rules
-   uint8_t        index[ MAX_PRIOR];            // para cada priodidad llevo un index para saber a cual le toca luego
-   taskContext    list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana estatica
+   uint8_t        index[ MAX_PRIOR];           // para cada priodidad llevo un index para saber a cual le toca luego
+   taskContext_t  list [ MAX_PRIOR][MAX_TASK]; // aca estan todas las tareas, en una sabana estatica
 } tasks_t;
 
 //en esta estructura tengo los campos de cada tarea, el nombre, el pool, etc. 
-typedef struct    taskParams_t {
+typedef struct    taskParams_struct {
    char           name[TASK_NAME_LENGTH]; // nombre de fantasia
    uint32_t*      pool;                   // espacio para el stack
    uint32_t       pool_size;              // tamanio del stack; sirve para arrancar desde el final y ver de no salirse
    void*          (*func)(void*);         // funcion que arranca
    void*          param;                  // se le puede pasar un parametro al inicio tambien
    void*          (*hook)(void*);         // si func termina se llama a hook. si hook termina bum!
-} taskParams;
+} taskParams_t;
 
 //y si... es global.. la uso en switcher, y en taskKernel.. decido publicarla,
 //aunque lo correcto seria hacer alguna funcion que tome sus campos publicos
@@ -80,12 +82,13 @@ typedef struct    taskParams_t {
 extern tasks_t   tasks;
 
 /*==================[declaraciones de datos externos]========================*/
-bool  initTasks     ( void                          );
-bool  taskCreate    ( taskParams* t, uint32_t prior );
-bool  taskYield     ( void                          );
-bool  taskBlock     ( void                          );
-void  triggerPendSv ( void                          );
-bool  taskDelay     ( uint32_t t                    );
-void* defaultHook   ( void*                         );
+bool     initTasks     ( void                            );
+bool     taskCreate    ( taskParams_t* t, uint32_t prior );
+bool     taskYield     ( void                            );
+bool     taskBlock     ( void                            );
+void     triggerPendSv ( void                            );
+bool     taskDelay     ( uint32_t t                      );
+void*    defaultHook   ( void*                           );
+void*    fakeFun       ( void* p                         );
 /*==================[end of file]============================================*/
 #endif

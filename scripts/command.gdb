@@ -1,5 +1,5 @@
 target remote localhost:3333
 break main
-break PendSV_Handler
+break task3
 set disassemble-next-line on
 conti

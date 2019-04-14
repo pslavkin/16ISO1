@@ -12,7 +12,7 @@ uint8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
 circularBuffer_t cb;
 queue_t printQueue;
 
-taskParams taskPrintParams = {
+taskParams_t taskPrintParams = {
    .name      = "taskPrint",
    .pool      = taskPrintPool,
    .pool_size = sizeof(taskPrintPool)/sizeof(taskPrintPool[0]),
@@ -25,15 +25,14 @@ void initPrintQueue(void)
    circularBuffer_Init ( &cb,cbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
    queueInit           ( &printQueue,&cb                         );
 }
+
 void* taskPrint(void* a)
 {
    uint8_t data[MAX_MSG_LENGTH];
    while(1) {
       queueRead   ( &printQueue,data );
       gpioWrite   ( LEDG,true        );
- //     mutexLock   ( &printfMutex     ); // con este mutex me evito que si otra
-         stdioPrintf ( UART_USB,data    );
-//      mutexUnlock ( &printfMutex     ); // con este mutex me evito que si otra
+      stdioPrintf ( UART_USB,data    );
       gpioWrite   ( LEDG,false       );
    }
    return NULL;
