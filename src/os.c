@@ -55,7 +55,7 @@ bool taskFill(taskParams* t, taskContext* c, uint32_t prior)
       c->pool       = t->pool;                  //puntero al stack que usara la tarea
       c->sp         = &t->pool[t->pool_size];   //pntero al FINAL del stack
       c->state      = READY;                    //arranca ready
-      c->sleepTicks = 0;                        //sin timer
+      c->sleep = 0;                        //sin timer
       c->prior      = prior;                    //defino la prioridad
       strcpy   ( c->name ,t->name );            // la tarea guard su nombre
       pushTask ( t       ,c       );            //ahora emula como su estuviera corriendo
@@ -111,13 +111,18 @@ void triggerPendSv(void)
 }
 bool taskDelay(uint32_t t)
 {
-   tasks.context->sleepTicks = t;       // guardo los tiks. Cuando llegue a cero pasa a READY
-   tasks.context->state      = WAITING; // o sea si guardo 2, hace tick->1 tick->0 tick->run
-   triggerPendSv();                     // listo, llamo a cambio de contecto
+   tasks.context->sleep = t;       // guardo los tiks. Cuando llegue a cero pasa a READY
+   tasks.context->state = WAITING; // o sea si guardo 2, hace tick->1 tick->0 tick->run
+   triggerPendSv();                // listo, llamo a cambio de contecto
 }
 bool taskYield(void)
 {
    tasks.context->state = READY;        // la tarea que llama claramente esta en running, pasa a ready
+   triggerPendSv();                     // listo, llamo a cambio de contecto
+}
+bool taskBlock(void)
+{
+   tasks.context->state = BLOCKED_TAKE; // la bloqueo y no se quien la salva.. es para debug
    triggerPendSv();                     // listo, llamo a cambio de contecto
 }
 

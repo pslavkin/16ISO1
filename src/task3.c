@@ -2,10 +2,12 @@
 #include "string.h"
 #include "os.h"
 #include "sapi.h"
+#include "mutex.h"
 #include "semphr.h"
 #include "systick.h"
 #include "task1.h"
 #include "task3.h"
+#include "taskprint.h"
 
 uint32_t task3Pool[MIN_STACK];
 
@@ -23,37 +25,29 @@ void* task3(void* a)
    uint8_t buf;
    while(1) {
       mutexLock  ( &printfMutex  );
-      //stdioPrintf(UART_USB,"Tarea= %s Numero= %d\r\n",
-      //      tasks.context->name,tasks.context->number);
-      stdioPrintf(UART_USB,"Ingrese codigo\r\n");
+         stdioPrintf(UART_USB,"Ingrese codigo\r\n");
       mutexUnlock ( &printfMutex );
- 
+
       while(uartReadByte( UART_USB, &buf)==false) {
          taskDelay(mseg2Ticks(100));
          }
       switch (buf) {
          case '1':
-            mutexLock  ( &printfMutex  );
+//            mutexLock  ( &printfMutex  );
             stdioPrintf(UART_USB,"operacion 1\r\n");
+ //           mutexUnlock ( &printfMutex );
             semphrGive(&printfSemphr,1);
-            mutexUnlock ( &printfMutex );
             break;
          case '2':
-            mutexLock  ( &printfMutex  );
-            stdioPrintf(UART_USB,"operacion 2\r\n");
+            //mutexLock  ( &printfMutex  );
+            //stdioPrintf(UART_USB,"operacion 2\r\n");
+            //mutexUnlock ( &printfMutex );
             semphrGive(&printfSemphr,2);
-            mutexUnlock ( &printfMutex );
             break;
-         case '3':
-            {
-            uint8_t data[30];
+         case '3': {
+            uint8_t data[MAX_MSG_LENGTH];
             sprintf(data,"op3 tick=%d\r\n",getTicks());
-            queueWrite  ( &printfQueue,data );
-            sprintf(data,"op3 tick=%d\r\n",getTicks());
-            queueWrite  ( &printfQueue,data );
-            mutexLock   ( &printfMutex                   );
-            stdioPrintf ( UART_USB,"operacion 3\r\n"     );
-            mutexUnlock ( &printfMutex                   );
+            queueWrite  ( &printQueue,data );
             }
             break;
          default:

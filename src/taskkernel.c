@@ -1,7 +1,7 @@
 #include <stdint.h>
 #include "string.h"
-#include "os.h"
 #include "sapi.h"
+#include "os.h"
 #include "systick.h"
 #include "taskkernel.h"
 #include "taskidle.h"
@@ -50,16 +50,8 @@ void* taskKernel(void* p)
 #endif
          switch (tasks.list[i][tasks.index[i]].state) {        // podria hacer un if pero tego otros planes luego
             case READY:                                        // la primera que este READY
-               tasks.context = &tasks.list[i][tasks.index[i]];         // actualizo el index
-               goto end;                                               // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
-            case BLOCKED:                                              // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][tasks.index[i]].semphr!=NULL &&
-                  tasks.list[i][tasks.index[i]].semphr->count>0) {
-                     tasks.list[i][tasks.index[i]].semphr->count--;
-                     tasks.list[i][tasks.index[i]].semphr         = NULL; // TODO: creo que no hace falta..borro el puntero al semphr
-                     tasks.context = &tasks.list[i][tasks.index[i]];      // actualizo el index
-                     goto end;                                            // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
-               }
+               tasks.context = &tasks.list[i][tasks.index[i]]; // actualizo el index
+               goto end;                                       // en serio me lo decis?? sip. asi es. aca esta, prestando servicios, si Kernighan lo eligio yo lo uso.. Que queres que ponga flags en el for? bdddd
             default:
                break;
          }
@@ -73,3 +65,53 @@ end:
    tasks.context->state = RUNNING;                             // esto es absolutamente evitable. lo dejo solo para mantener las formas
    enableSystickIrq();                                         // habilito d nuevo el systick
 }
+//-----------------------------------------------------------------------
+bool freeBlockedGived   ( event_t* m)           // cuando se hace un take, libera las tareas esperando un give
+{
+   int8_t i,j,k;
+   for (i=(MAX_PRIOR-1);i>=0;i--) {                // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
+      k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;j<MAX_TASK;j++) {                    // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                         // incremento modulo MAX
+         switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED_GIVE:                     // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].event==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  tasks.list[i][k].event = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
+                  if(i>=tasks.context->prior)      // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                     return true;                  // aviso que voy a hacer yield, cuando termine de desbloquear todo
+               }
+               break;
+            default:
+               break;
+         }
+      }
+   }
+   return false;
+}
+bool freeBlockedTaked   ( event_t* m)          // cuando se hace el give, libera las tareas esperando un take
+{
+   bool yield=false;
+   int8_t i,j,k;
+   for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {  // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
+      k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;m->count>0 && j<MAX_TASK;j++) {      // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                         // incremento modulo MAX
+         switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED_TAKE:                     // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].event==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  m->count--;                      // decremento en uno el numero de semaforos
+                  tasks.list[i][k].event = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].state  = READY; // aviso que esta taera pasa a ready
+                  if(i>=tasks.context->prior)      // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                     yield = true;                 // aviso que voy a hacer yield, cuando termine de desbloquear todo
+               }
+               break;
+            default:
+               break;
+         }
+      }
+   }
+   return yield;                                   //por ahora no uso la salida de esta func.
+}
+

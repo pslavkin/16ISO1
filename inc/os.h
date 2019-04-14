@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "semphr.h"
 
 #define WEAK        __attribute__ ((weak))
 #define ALIAS(f)    __attribute__ ((weak, alias (#f)))
@@ -14,6 +13,11 @@
                              // elgir lo que desee
 #define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.
 
+typedef struct    event_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
+   uint32_t count;                // lleva cuenta de cuantos gives se hicieron
+   uint32_t max;                  // maximo de gives admitidos
+} event_t;
+
 enum taskState{
    READY=0, // esperando su turno.
    WAITING, // en este estado esta cuando se prende un taskDelay o un taskYield
@@ -22,7 +26,8 @@ enum taskState{
             // no se necesita para nada
    EMPTY,   // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta
             // usando por ahora..
-   BLOCKED, // la estoy usando para los mutex por ejemplo
+   BLOCKED_TAKE, // TODO: Comantarla estoy usando para los mutex por ejemplo
+   BLOCKED_GIVE, // TODO: Comantarla estoy usando para los mutex por ejemplo
 };
 
 
@@ -38,8 +43,8 @@ typedef struct    taskContext_t {
                                           // see. pero es rapida, facil y no indexa. my room, my rules
    uint32_t*      pool;                   // puntero al inicio del stack (no al final) por el final arranca sp
    enum taskState state;                  // running, waiting, etc.
-   semphr_t*      semphr;                 // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
-   uint32_t       sleepTicks;             // aca lleva cuent de cuanto le falta para pasar a running
+   event_t*       event;                  // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
+   uint32_t       sleep;             // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad
    uint8_t        number;                 // un numero que en realidad es la posicion dentro del arreglo estatico de la prioridad en la que elgio estar
@@ -78,6 +83,7 @@ extern tasks_t   tasks;
 bool  initTasks     ( void                          );
 bool  taskCreate    ( taskParams* t, uint32_t prior );
 bool  taskYield     ( void                          );
+bool  taskBlock     ( void                          );
 void  triggerPendSv ( void                          );
 bool  taskDelay     ( uint32_t t                    );
 void* defaultHook   ( void*                         );
