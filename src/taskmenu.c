@@ -21,13 +21,27 @@ taskParams_t taskMenuParams = {
    .hook      = defaultHook,
 };
 
+void printHelpMenu(void)
+{
+   uint8_t i;
+   uint8_t* help[]= {
+      "1 - hace 1 semphrGive\r\n",
+      "2 - hace 2 semphrGive\r\n",
+      "3 - hace 3 semphrGive\r\n",
+      "4 - stats\r\n",
+      "5 - ticks\r\n"
+   };
+   for(i=0;i<sizeof(help)/sizeof(help[0]);i++) {
+      queueWrite(&printQueue,help[i]);
+   }
+}
 void* taskMenu(void* a)
 {
    uint8_t buf;
    while(1) {
       queueWrite  ( &printQueue,">" );
       while(uartReadByte( UART_USB, &buf)==false) {
-         taskDelay(mseg2Ticks(100));
+         taskDelay(mseg2Ticks(1000));
       }
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {
@@ -45,9 +59,12 @@ void* taskMenu(void* a)
             break;
          case '5': {
             uint8_t data[MAX_MSG_LENGTH];
-            sprintf(data,"op3 tick=%d\r\n",getTicks());
-            queueWrite  ( &printQueue,data );
+            sprintf    ( data,"ticks=%d\r\n",getTicks( ));
+            queueWrite ( &printQueue,data              ) ;
             }
+            break;
+         case '?':
+            printHelpMenu();
             break;
          default:
             break;

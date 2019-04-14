@@ -7,8 +7,8 @@
 #define WEAK        __attribute__ ((weak))
 #define ALIAS(f)    __attribute__ ((weak, alias (#f)))
 
-#define MAX_PRIOR        10  // 10 prioridades, cada una
-#define MAX_TASK         10  // con 10 tareas
+#define MAX_PRIOR        10  // 10 prioridades
+#define MAX_TASK         10  // 10 tareas x cada prioridad
 #define MIN_STACK        400 // minimo stack para cada tarea, pero igualmente cada tarea puede
                              // elgir lo que desee
 #define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.

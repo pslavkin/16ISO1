@@ -25,14 +25,14 @@ taskParams_t task2Params = {
 
 void* task2(void* a)
 {
-   float  pi=300.14;
+   float  pi=3.14;
+   uint8_t data[100];
    int p;
    while(1) {
       semphrTake ( &printfSemphr );                             // con este mutex me evito que si otra
       gpioToggle(LED2);
-      pi/=2;
-      if(pi>10) p=100;
-      else p=200;
+      pi=pi*1.001;
+      queueWrite(&printQueue,ftostr(pi,data));
    }
    return NULL;
 }

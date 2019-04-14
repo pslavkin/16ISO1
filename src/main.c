@@ -26,7 +26,7 @@ int main( void )
 
    initTasks        ( );               // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
 
-   taskCreate ( &taskPrintParams    ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
+   taskCreate ( &taskPrintParams    ,2 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &taskMenuParams     ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task1Params        ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task2Params        ,1 ); // se deja fuera la prioridad para visualizarlas aca

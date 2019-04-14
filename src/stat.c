@@ -21,7 +21,7 @@ void printTaskStat(taskContext_t* t)
       "blocked_give"
    };
 
-   sprintf(data,"%s-%s-%d-%d-%d\r\n",
+   sprintf(data,"%16s | %16s | %5d | %5d | %8d\r\n",
          t->name,
          status[t->state],
          t->prior,
@@ -33,7 +33,16 @@ void printTaskStat(taskContext_t* t)
 void printTasksStat(tasks_t* t)                             //imprimie la estadisticas de todas las tareas en la lista que no sen empty
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
-   queueWrite(&printQueue,"name-state-prior-stack-run\r\n");
+   uint8_t data[MAX_MSG_LENGTH];
+   sprintf(data,"%16s | %16s | %5s | %5s | %8s\r\n"
+                "-------------------------------------------------------------------\r\n",
+         "name",
+         "state",
+         "prior",
+         "stack",
+         "run"
+         );
+   queueWrite(&printQueue,data);
    for (i=(MAX_PRIOR-1);i>=0;i--) {                            // arranca siempre desde la maxima prioridad
       for(j=0;j<MAX_TASK;j++) {                                // barro todas las tareas del grupo de prioridad
          if(t->list[i][j].state!=EMPTY)

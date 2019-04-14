@@ -8,7 +8,7 @@
 #include "taskprint.h"
 
 uint32_t taskPrintPool[MIN_STACK];
-uint8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
+int8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
 circularBuffer_t cb;
 queue_t printQueue;
 
@@ -26,14 +26,39 @@ void initPrintQueue(void)
    queueInit           ( &printQueue,&cb                         );
 }
 
+
+
+
+
 void* taskPrint(void* a)
 {
    uint8_t data[MAX_MSG_LENGTH];
    while(1) {
-      queueRead   ( &printQueue,data );
-      gpioWrite   ( LEDG,true        );
-      stdioPrintf ( UART_USB,data    );
-      gpioWrite   ( LEDG,false       );
+      queueRead       ( &printQueue ,data  );
+      gpioWrite       ( LEDG        ,true  );
+      uartWriteString ( UART_USB    ,data  );
+      gpioWrite       ( LEDG        ,false );
    }
    return NULL;
 }
+//----convierte float a string para validar float preemptive--------------
+char* ftostr  (float fVal,char* str)
+{
+ int32_t Entera, Dec;
+ uint8_t Len;
+ uint8_t Sign[]="+";
+
+ Entera  = fVal;
+ Dec     = (int32_t)(fVal * 1000);
+ Dec    %= 1000;
+ if(fVal<0) {
+    Dec     = -Dec;
+    Entera  = -Entera;
+    Sign[0] = '-';
+ }
+ Len=sprintf(str,"%s%d",Sign,Entera);
+ str[Len++] = '.';
+ sprintf(str+Len,"%d\r\n",Dec);
+ return str;
+}
+

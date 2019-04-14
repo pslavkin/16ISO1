@@ -23,9 +23,13 @@ taskParams_t task3Params = {
 
 void* task3(void* a)
 {
+   float  f=3.14;
+   uint8_t data[100];
    while(1) {
       semphrTake ( &printfSemphr ); // con este mutex me evito que si otra
       gpioToggle ( LED3          );
+      f*=1.005;
+      queueWrite(&printQueue,ftostr(f,data));
    }
    return NULL;
 }
