@@ -31,7 +31,7 @@ int main( void )
    taskCreate ( &task1Params        ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task2Params        ,1 ); // se deja fuera la prioridad para visualizarlas aca
    taskCreate ( &task3Params        ,1 );
-   taskCreate ( &taskTemplateParams ,1 );
+   taskCreate ( &taskTemplateParams ,2 );
 
    initSystick   ( );                  // irq de base de tiempo
    triggerPendSv ( );                  // solicita irq para que todo avance.
