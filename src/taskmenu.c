@@ -39,9 +39,9 @@ void* taskMenu(void* a)
 {
    uint8_t buf;
    while(1) {
-      queueWrite  ( &printQueue,">" );
+      queueWrite  ( &printQueue,"ingrese codigo>" );
       while(uartReadByte( UART_USB, &buf)==false) {
-         taskDelay(mseg2Ticks(1000));
+         taskDelay(mseg2Ticks(100));
       }
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {
@@ -67,6 +67,7 @@ void* taskMenu(void* a)
             printHelpMenu();
             break;
          default:
+            queueWrite ( &printQueue,"invalid\r\n");
             break;
       }
    }

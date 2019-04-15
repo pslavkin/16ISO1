@@ -7,7 +7,7 @@
 #include "mutex.h"
 #include "taskprint.h"
 
-uint32_t taskPrintPool[MIN_STACK];
+uint32_t taskPrintPool[2*MIN_STACK];
 int8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
 circularBuffer_t cb;
 queue_t printQueue;
@@ -25,10 +25,6 @@ void initPrintQueue(void)
    circularBuffer_Init ( &cb,cbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
    queueInit           ( &printQueue,&cb                         );
 }
-
-
-
-
 
 void* taskPrint(void* a)
 {

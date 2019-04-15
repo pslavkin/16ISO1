@@ -27,7 +27,6 @@ void* task2(void* a)
 {
    float  pi=3.14;
    uint8_t data[100];
-   int p;
    while(1) {
       semphrTake ( &printfSemphr );                             // con este mutex me evito que si otra
       gpioToggle(LED2);

@@ -14,16 +14,11 @@
 //defino por ahora en esta tarea mi primer mutex que lo comparto con el resto
 //de las tareas haciendolo ectern en el .h, pero el lugar correcto para
 //definirlo seria en algun file relacionado con la transmision por uart
-semphr_t printfMutex;
 semphr_t printfSemphr;
 
-void initPrintfMutex(void)
-{
-   mutexInit(&printfMutex);
-}
 void initPrintfSemphr(void)
 {
-   semphrInit(&printfSemphr,250);
+   semphrInit(&printfSemphr,5);
 }
 //------------------------------------------
 uint32_t task1Pool[MIN_STACK];

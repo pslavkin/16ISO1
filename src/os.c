@@ -52,14 +52,16 @@ bool pushTask(taskParams_t* t, taskContext_t* c)
 //los parametros que se pasan. el nombre, la prioridad, etc.
 bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
 {
-      c->pool       = t->pool;                  //puntero al stack que usara la tarea
-      c->sp         = &t->pool[t->pool_size];   //pntero al FINAL del stack
-      c->state      = READY;                    //arranca ready
-      c->sleep = 0;                        //sin timer
-      c->prior      = prior;                    //defino la prioridad
-      strcpy   ( c->name ,t->name );            // la tarea guard su nombre
-      pushTask ( t       ,c       );            //ahora emula como su estuviera corriendo
-      return true;                              //TODO por ahora siempre funciona.. peeero
+      c->pool      = t->pool;                // puntero al stack que usara la tarea
+      c->sp        = &t->pool[t->pool_size]; // pntero al FINAL del stack
+      c->state     = READY;                  // arranca ready
+      c->sleep     = 0;                      // sin timer
+      c->prior     = prior;                  // defino la prioridad
+      c->waterMark = 0x7FFFFFFF;             // defino un stack imposible para que en el primer estampado se pise con el valor real.
+      c->runCount  = 0;                      // numero de veces que corrio.
+      strcpy   ( c->name ,t->name );         // la tarea guard su nombre
+      pushTask ( t       ,c       );         // ahora emula como su estuviera corriendo
+      return true;                           // TODO por ahora siempre funciona.. peeero
 }
 
 bool taskCreate(taskParams_t* t, uint32_t prior)
@@ -87,8 +89,6 @@ bool initTasks(void)
    for(i=0;i<MAX_PRIOR;i++) {
       for(j=0;j<MAX_TASK;j++) {
          tasks.list[i][j].state     = EMPTY;      // arranca en EMPTY que se interpreta como hueco en la lista de tareas, se puede usar para meter una tarea on run-time
-         tasks.list[i][j].waterMark = 0x7FFFFFFF; // defino un stack imposible para que en el primer estampado se pise con el valor real. 
-         tasks.list[i][j].runCount  = 0;          // numero de veces que corrio.
       }
       tasks.index[i] = 0;                         // arranco desde la 1er tarea de cada priodidadd
    }
