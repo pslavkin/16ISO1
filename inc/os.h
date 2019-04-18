@@ -19,15 +19,15 @@ typedef struct    event_struct { // ok, si por ahora esta estructura no es muy u
 } event_t;
 
 enum taskState{
-   READY=0, // esperando su turno.
-   WAITING, // en este estado esta cuando se prende un taskDelay o un taskYield
-   RUNNING, // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
-            // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
-            // no se necesita para nada
-   EMPTY,   // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta usando por ahora..
-   DELETED, // TODO
-   BLOCKED_TAKE, // TODO: Comantarla estoy usando para los mutex por ejemplo
-   BLOCKED_GIVE, // TODO: Comantarla estoy usando para los mutex por ejemplo
+   READY=0,      // esperando su turno.
+   WAITING,      // en este estado esta cuando se prende un taskDelay o un taskYield
+   RUNNING,      // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
+                 // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
+                 // no se necesita para nada
+   EMPTY,        // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta usando por ahora..
+   DELETED,      // solo para debug para que me deje rastro de que la tarea fue borrada on the fly y la vea en el stat..
+   BLOCKED_TAKE, // distingo entre bloqueado porque hico un take de un evento y no hay nada..
+   BLOCKED_GIVE, // distingo entre bloqueado porque quiso enviar un evento y no habia mas lugar.. eso me permite hacer una busqueda iterada mas eficiente
 };
 
 

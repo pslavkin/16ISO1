@@ -57,13 +57,16 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
       c->state     = READY;                  // arranca ready
       c->sleep     = 0;                      // sin timer
       c->prior     = prior;                  // defino la prioridad
-      c->waterMark = 0x7FFFFFFF;             // defino un stack imposible para que en el primer estampado se pise con el valor real.
       c->runCount  = 0;                      // numero de veces que corrio.
       strcpy   ( c->name ,t->name );         // la tarea guard su nombre
       pushTask ( t       ,c       );         // ahora emula como su estuviera corriendo
+      c->waterMark = c->sp-c->pool;          // ahora que meti algo en el stack, defino el watermark
       return true;                           // TODO por ahora siempre funciona.. peeero
 }
 
+//busca un huevo en la lista de la prioridad solicitada y si no hay ninguna empty 
+//prueba si no hay alguna deleted, que lo uso para debug para dejar rastros de tareas borradas
+//on the fly...
 bool taskCreate(taskParams_t* t, uint32_t prior)
 {
    uint8_t i;
@@ -80,6 +83,9 @@ bool taskCreate(taskParams_t* t, uint32_t prior)
    }
 }
 
+//busca por nombre nua tarea en la lista.. no es tan eficiente, pero no estoy guardando un ID
+//unico por tarea.. sera mas interesante, o sea, el numero esta es la sima de prior|index pero
+//no lo estoy gardando en ninguna ladao por ahora...
 taskContext_t* taskFind(taskParams_t* t)
 {
    uint8_t i,j;
@@ -94,8 +100,8 @@ taskContext_t* taskFind(taskParams_t* t)
 }
 bool taskDelete(taskContext_t* c)
 {
-   if(c!=NULL)
-      c->state=DELETED;      //se entiende? o lo tengo que explicar??
+   if(c!=NULL)          // si me piden borrar una tarea NULL, explota!
+      c->state=DELETED; // se entiende? o lo tengo que explicar??
    return true;
 }
 
@@ -107,9 +113,9 @@ bool initTasks(void)
 
    for(i=0;i<MAX_PRIOR;i++) {
       for(j=0;j<MAX_TASK;j++) {
-         tasks.list[i][j].state     = EMPTY;      // arranca en EMPTY que se interpreta como hueco en la lista de tareas, se puede usar para meter una tarea on run-time
+         tasks.list[i][j].state = EMPTY; // arranca en EMPTY que se interpreta como hueco en la lista de tareas, se puede usar para meter una tarea on run-time
       }
-      tasks.index[i] = 0;                         // arranco desde la 1er tarea de cada priodidadd
+      tasks.index[i] = 0;                // arranco desde la 1er tarea de cada priodidadd
    }
   // si, el kernel tambien es una tarea, aunque no esta en la lista de tareas  de tasks..
   // tiene su estructura aparte, pero los mismos parametros.

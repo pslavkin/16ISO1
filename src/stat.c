@@ -12,6 +12,7 @@
 void printTaskStat(taskContext_t* t)
 {
    uint8_t data[MAX_MSG_LENGTH];
+   //estados posibles, sincronizar con el enum taskState de os.c
    uint8_t* status[]= {
       "ready",
       "waiting",
@@ -23,11 +24,23 @@ void printTaskStat(taskContext_t* t)
    };
 
    sprintf(data,"%16s | %12s | %5d | %5d | %8d | %8s%",
-         t->name,
-         status[t->state],
-         t->prior,
-         t->waterMark,
-         t->runCount,
+         t->name,          // nombre de fantasia
+         status[t->state], // estado
+         t->prior,         // prioridad de la tarea
+         t->waterMark,     // minima distancia entre el inicio del pool y por donde esta el sp
+         t->runCount,      // numero de veces que fue atendida por el scheduler
+         //aca viene la injusticia... solo es cualitativa la medicino (aunque anda muy bien
+         //tengo que decir) pero solo toma la relacion de veces que fue atendida versus la
+         //cantidad de veces que fue llamado el cambio de contexto. Pero por ejemplo si una
+         //tarea es llamada muchas veces pero no hace nada, solo cede el CPU, y otro es llamada
+         //cada mucho tiempo y usa mucho CPU, estaria midiendo injustamente.. por otra parte si
+         //la tarea es borrada en tiempo de ejecucion, se pierde la relacion. Por eso muestro
+         //tambein en la tabla las tareas que fueron borradas.. hasta que alguna creacino de
+         //tareas on-runtime no tenga mas lugar y ahi la pista y ahi si se pierde la relacion
+         //matematica entre numero de atenciones del kernel y sumatoria de atenciones de todas
+         //las tareas, porque hay una tarea borrada que usao tiempo y no figura mas.. 
+         //para resolverlo se puede resetear todos los contadores o descontar, o algo.. decido
+         //no hacer nada , es un caso muyyy border...
          ftostr(((float)t->runCount*100)/kernelContext.runCount,data+MAX_MSG_LENGTH-15)
          );
    queueWrite(&printQueue,data);
@@ -46,14 +59,14 @@ void printTasksStat(tasks_t* t)                             //imprimie la estadi
          "use"
          );
    queueWrite(&printQueue,data);
-   for (i=(MAX_PRIOR-1);i>=0;i--) {                            // arranca siempre desde la maxima prioridad
-      for(j=0;j<MAX_TASK;j++) {                                // barro todas las tareas del grupo de prioridad
-         if(t->list[i][j].state!=EMPTY)
-            printTaskStat(&t->list[i][j]);
+   for (i=(MAX_PRIOR-1);i>=0;i--) {        // arranca siempre desde la maxima prioridad
+      for(j=0;j<MAX_TASK;j++) {            // barro todas las tareas del grupo de prioridad
+         if(t->list[i][j].state!=EMPTY)    // muestra en la tabla las que no estan empty. Ojo que si muestra las DELETED
+            printTaskStat(&t->list[i][j]); // imprime la linea con los datos de dicha tarea..
       }
    }
-   printTaskStat ( &idleContext   );   //si, idel tambien es una tarea.
-   printTaskStat ( &kernelContext );   //y tambien el kernel
+   printTaskStat ( &idleContext   );       // si, idel tambien es una tarea.
+   printTaskStat ( &kernelContext );       // y tambien el kernel
 }
 int32_t stampWaterMark(taskContext_t* t)  //pone la peor marca del stack, la que estuvo mas cercad de desbordar
 {

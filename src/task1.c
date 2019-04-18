@@ -36,12 +36,13 @@ taskParams_t task1Params = {
 void* task1(void* a)
 {
    while(1) {
-      semphrTake ( &printfSemphr                ) ;
+      //semphrTake ( &printfSemphr                ) ;
+      //gpioToggle ( LED1                         ) ;
+      //taskCreate ( &taskTemplateParams ,5       ) ;   //crea una tarea en tiempo real
+      //semphrTake ( &printfSemphr                ) ;
       gpioToggle ( LED1                         ) ;
-      taskCreate ( &taskTemplateParams ,5       ) ;
-      semphrTake ( &printfSemphr                ) ;
-      gpioToggle ( LED1                         ) ;
-      taskDelete ( taskFind(&taskTemplateParams ));
+//      taskDelay(msec2Ticks(1));
+      //taskDelete ( taskFind(&taskTemplateParams ));   //la borra
    }
    return NULL;
 }
