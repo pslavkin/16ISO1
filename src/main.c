@@ -3,6 +3,7 @@
 #include "task1.h"
 #include "task2.h"
 #include "task3.h"
+#include "taskkey.h"
 #include "taskmenu.h"
 #include "tasktemplate.h"
 #include "taskprint.h"
@@ -27,11 +28,12 @@ int main( void )
    initTasks        ( );               // inicializa las estructuras de control de tareas, lanza el taskkernel y el taskidle
 
    taskCreate ( &taskPrintParams    ,4 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
-   taskCreate ( &taskMenuParams     ,5 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
+   taskCreate ( &taskMenuParams     ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task1Params        ,1 ); // 3 tareas de ejemplo. reciben una estructura con las opciones pero
    taskCreate ( &task2Params        ,1 ); // se deja fuera la prioridad para visualizarlas aca
    taskCreate ( &task3Params        ,1 );
-   taskCreate ( &taskTemplateParams ,2 );
+   taskCreate ( &taskKeyParams      ,1 );
+//   taskCreate ( &taskTemplateParams ,5 );
 
    initSystick   ( );                  // irq de base de tiempo
    triggerPendSv ( );                  // solicita irq para que todo avance.

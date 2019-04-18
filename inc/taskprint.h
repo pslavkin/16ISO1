@@ -2,7 +2,7 @@
 #define TASKPRINT
 
 #define MAX_PRINT_MSG  10
-#define MAX_MSG_LENGTH 200
+#define MAX_MSG_LENGTH 255
 
 extern queue_t    printQueue;
 extern taskParams_t taskPrintParams;

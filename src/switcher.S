@@ -13,7 +13,6 @@ PendSV_Handler:
    vpusheq {s16-s31}        // al ejec
 
    push {r4-r11,lr}         // estos registros no se guardan automaticamente
-
    ldr  r4 ,=tasks          // mi estrategia es guardar SIEMPRE el sp de la tarea interrumpida
    ldr  r5 ,[r4]            // tasks,context es el contexto de la tarea interrumpida
    str  sp ,[r5]            // listo, guardado por donde iba el sp

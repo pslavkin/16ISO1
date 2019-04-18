@@ -7,6 +7,7 @@
 #include "queue.h"
 #include "systick.h"
 #include "task1.h"
+#include "tasktemplate.h"
 #include "taskprint.h"
 #include "stat.h"
 
@@ -34,12 +35,13 @@ taskParams_t task1Params = {
 
 void* task1(void* a)
 {
-   uint32_t i,j;
-   uint32_t firstTick,diff;
-
    while(1) {
-      semphrTake( &printfSemphr );
-      gpioToggle(LED1);
+      semphrTake ( &printfSemphr                ) ;
+      gpioToggle ( LED1                         ) ;
+      taskCreate ( &taskTemplateParams ,5       ) ;
+      semphrTake ( &printfSemphr                ) ;
+      gpioToggle ( LED1                         ) ;
+      taskDelete ( taskFind(&taskTemplateParams ));
    }
    return NULL;
 }

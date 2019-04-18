@@ -41,7 +41,7 @@ void* taskMenu(void* a)
    while(1) {
       queueWrite  ( &printQueue,"ingrese codigo>" );
       while(uartReadByte( UART_USB, &buf)==false) {
-         taskDelay(mseg2Ticks(100));
+         taskDelay(msec2Ticks(100));
       }
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {

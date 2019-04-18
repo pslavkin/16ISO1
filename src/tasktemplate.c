@@ -27,7 +27,7 @@ taskParams_t taskTemplateParams = {
 void* taskTemplate(void* a)
 {
    while(1) {
-      taskDelay  ( mseg2Ticks(1000 ));
+      taskDelay  ( msec2Ticks(1000 ));
       gpioToggle ( LED3            ) ;
    }
    return NULL;

@@ -24,8 +24,8 @@ enum taskState{
    RUNNING, // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
             // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
             // no se necesita para nada
-   EMPTY,   // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta
-            // usando por ahora..
+   EMPTY,   // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta usando por ahora..
+   DELETED, // TODO
    BLOCKED_TAKE, // TODO: Comantarla estoy usando para los mutex por ejemplo
    BLOCKED_GIVE, // TODO: Comantarla estoy usando para los mutex por ejemplo
 };
@@ -82,13 +82,15 @@ typedef struct    taskParams_struct {
 extern tasks_t   tasks;
 
 /*==================[declaraciones de datos externos]========================*/
-bool     initTasks     ( void                            );
-bool     taskCreate    ( taskParams_t* t, uint32_t prior );
-bool     taskYield     ( void                            );
-bool     taskBlock     ( void                            );
-void     triggerPendSv ( void                            );
-bool     taskDelay     ( uint32_t t                      );
-void*    defaultHook   ( void*                           );
-void*    fakeFun       ( void* p                         );
+bool           initTasks     ( void                            );
+bool           taskCreate    ( taskParams_t* t, uint32_t prior );
+bool           taskYield     ( void                            );
+bool           taskBlock     ( void                            );
+void           triggerPendSv ( void                            );
+bool           taskDelay     ( uint32_t t                      );
+void*          defaultHook   ( void*                           );
+void*          fakeFun       ( void* p                         );
+bool           taskDelete    ( taskContext_t* c                );
+taskContext_t* taskFind      ( taskParams_t* t                 );
 /*==================[end of file]============================================*/
 #endif

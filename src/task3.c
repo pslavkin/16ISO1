@@ -24,7 +24,7 @@ taskParams_t task3Params = {
 void* task3(void* a)
 {
    float  f=3.14;
-   uint8_t data[100];
+   uint8_t data[20];                // se necesitan 15 para el numero mas grande representable +2147483647.647
    while(1) {
       semphrTake ( &printfSemphr ); // con este mutex me evito que si otra
       gpioToggle ( LED3          );

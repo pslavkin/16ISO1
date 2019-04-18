@@ -67,16 +67,35 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
 bool taskCreate(taskParams_t* t, uint32_t prior)
 {
    uint8_t i;
-   for(i=0;i<MAX_TASK;i++)
-      if(tasks.list[prior][i].state==EMPTY) {
-         tasks.list[prior][i].number=i;
-         return taskFill(t,&tasks.list[prior][i],prior);
+   for(i=0;i<MAX_TASK && tasks.list[prior][i].state!=EMPTY;i++)
+      ;
+   if(i==MAX_TASK)
+      for(i=0;i<MAX_TASK && tasks.list[prior][i].state!=DELETED;i++)
+         ;
+   if(i==MAX_TASK)
+      return false;
+   else {
+      tasks.list[prior][i].number=i;
+      return taskFill(t,&tasks.list[prior][i],prior);
+   }
+}
+
+taskContext_t* taskFind(taskParams_t* t)
+{
+   uint8_t i,j;
+   for(i=0;i<MAX_PRIOR;i++)
+      for(j=0;j<MAX_TASK;j++) {
+         if(tasks.list[i][j].state!= EMPTY            &&
+            tasks.list[i][j].state!= DELETED          &&
+            strcmp(tasks.list[i][j].name,t->name)==0)
+               return &tasks.list[i][j];
       }
-   return false;
+   return NULL;
 }
 bool taskDelete(taskContext_t* c)
 {
-   c->state=EMPTY;      //se entiende? o lo tengo que explicar??
+   if(c!=NULL)
+      c->state=DELETED;      //se entiende? o lo tengo que explicar??
    return true;
 }
 

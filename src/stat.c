@@ -17,16 +17,18 @@ void printTaskStat(taskContext_t* t)
       "waiting",
       "running",
       "empty",
+      "deleted",
       "blocked_take",
       "blocked_give"
    };
 
-   sprintf(data,"%16s | %16s | %5d | %5d | %8d\r\n",
+   sprintf(data,"%16s | %12s | %5d | %5d | %8d | %8s%",
          t->name,
          status[t->state],
          t->prior,
          t->waterMark,
-         t->runCount
+         t->runCount,
+         ftostr(((float)t->runCount*100)/kernelContext.runCount,data+MAX_MSG_LENGTH-15)
          );
    queueWrite(&printQueue,data);
 }
@@ -34,13 +36,14 @@ void printTasksStat(tasks_t* t)                             //imprimie la estadi
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
    uint8_t data[MAX_MSG_LENGTH];
-   sprintf(data,"%16s | %16s | %5s | %5s | %8s\r\n"
-                "-------------------------------------------------------------------\r\n",
+   sprintf(data,"%16s | %12s | %5s | %5s | %8s | %%%4s\r\n"
+                "--------------------------------------------------------------------------\r\n",
          "name",
          "state",
          "prior",
          "stack",
-         "run"
+         "run",
+         "use"
          );
    queueWrite(&printQueue,data);
    for (i=(MAX_PRIOR-1);i>=0;i--) {                            // arranca siempre desde la maxima prioridad

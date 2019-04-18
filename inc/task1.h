@@ -12,6 +12,5 @@ void  initPrintfMutex  ( void    );
 void  initPrintfSemphr ( void    );
 void  initPrintfQueue  ( void    );
 void* task1            ( void* a );
-void* hook1            ( void* p );
 /*==================[end of file]============================================*/
 #endif
