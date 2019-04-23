@@ -11,8 +11,16 @@
 #include "task2.h"
 #include "taskprint.h"
 #include "stat.h"
+#include "convert.h"
 
 uint32_t task2Pool[REASONABLE_STACK];
+
+semphr_t task2Semphr;
+
+void task2Init(void)
+{
+   semphrInit(&task2Semphr,5);
+}
 
 taskParams_t task2Params = {
    .name      = "task2",
@@ -21,18 +29,24 @@ taskParams_t task2Params = {
    .param     = NULL,
    .func      = task2,
    .hook      = defaultHook,
-   .init      = NULL,
+   .init      = task2Init,
 };
 
+task1QueueStruct_t t1_copy;
 void* task2(void* a)
 {
-   float  pi=3.14;
-   uint8_t data[20];                // se necesitan 15 para el numero mas grande representable +2147483647.647
    while(1) {
-      semphrTake ( &task1Semphr ); // con este mutex me evito que si otra
-      gpioToggle ( LED2          );
-      pi=pi*1.001;
-      queueWrite(&printQueue,ftostr(pi,data));
+      queueRead( &task1Queue, &t1_copy);//,msec2Ticks(1000) );
+      uint32_t i;
+      for(i=0;i<TASK1_BUFFER_SIZE;i++) {
+         t1_copy.buf[i]=(i%10)+(t1_copy.actual==0?'0':'A');
+      }
+      t1_copy.buf[i-3]='\r';
+      t1_copy.buf[i-2]='\n';
+      t1_copy.buf[i-1]='\0';
+      gpioToggle ( LED2 );
+      semphrGive(&task2Semphr,1);
+      queueWrite ( &printQueue,t1_copy.buf);
    }
    return NULL;
 }

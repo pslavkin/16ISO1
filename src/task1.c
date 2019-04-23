@@ -12,11 +12,26 @@
 #include "stat.h"
 
 //------------------------------------------
-semphr_t task1Semphr;
+
+#define TASK1_MSG_QTY 10
+#define TASK1_MSG_LENGTH (sizeof(task1QueueStruct_t))
+#define TASK1_BUFFER_SIZE 10
+
+int8_t  cbPool [(TASK1_MSG_QTY)*TASK1_MSG_LENGTH];
+circularBuffer_t t1Cb;
+queue_t task1Queue;
+
+uint8_t buf[2][TASK1_BUFFER_SIZE];
+task1QueueStruct_t t1={
+      .buf=buf[0],
+      .actual=0
+};
+
+uint32_t task1Pool[REASONABLE_STACK];
 
 void task1Init(void)
 {
-   semphrInit(&task1Semphr,5);
+   queueInit ( &task1Queue,&t1Cb,cbPool,TASK1_MSG_QTY,TASK1_MSG_LENGTH );
 }
 //------------------------------------------
 uint32_t task1Pool[REASONABLE_STACK];
@@ -34,16 +49,15 @@ taskParams_t task1Params = {
 void* task1(void* a)
 {
    while(1) {
-      //semphrTake ( &task1Semphr                ) ;
-      //gpioToggle ( LED1                         ) ;
-      //taskCreate ( &taskTemplateParams ,5       ) ;   //crea una tarea en tiempo real
-      //semphrTake ( &task1Semphr                ) ;
-//      uartWriteString ( UART_USB    ,"1234" );
-      if(semphrTakeTout ( &task1Semphr,msec2Ticks(8000))==false)
-        queueWrite(&printQueue,"agoto task1\r\n");
-      gpioToggle ( LED1                         ) ;
-      taskDelay(msec2Ticks(500));
-      //taskDelete ( taskFind(&taskTemplateParams ));   //la borra
+         taskDelay(msec2Ticks(20 ));
+         t1.buf    = buf[0];
+         t1.actual = 0;
+         queueWrite(&task1Queue,&t1);
+
+         taskDelay(msec2Ticks(20));
+         t1.buf    = buf[1];
+         t1.actual = 1;
+         queueWrite(&task1Queue,&t1);
    }
    return NULL;
 }

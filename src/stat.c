@@ -8,6 +8,7 @@
 #include "taskidle.h"
 #include "taskkernel.h"
 #include "taskprint.h"
+#include "convert.h"
 
 void printTaskStat(taskContext_t* t)
 {

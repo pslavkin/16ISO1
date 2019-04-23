@@ -47,14 +47,14 @@ void* taskMenu(void* a)
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {
          case '1':
-            if(semphrGiveTout(&task1Semphr,1,msec2Ticks(100))==false)
-               queueWrite ( &printQueue,"agoto semph\r\n");
+//            if(semphrGiveTout(&task1Semphr,1,msec2Ticks(100))==false)
+//               queueWrite ( &printQueue,"agoto semph\r\n");
             break;
          case '2':
-            semphrGive(&task1Semphr,2);
+//            semphrGive(&task1Semphr,2);
             break;
          case '3':
-            semphrGive(&task1Semphr,3);
+ //           semphrGive(&task1Semphr,3);
             break;
          case '4':
             printTasksStat(&tasks);
@@ -64,6 +64,11 @@ void* taskMenu(void* a)
             sprintf    ( data,"ticks=%d\r\n",getTicks( ));
             queueWrite ( &printQueue,data              ) ;
             }
+            break;
+         case '6':
+      mutexLock(&printMutex);
+            uartWriteString ( UART_USB    ,"prueba de que corrompe\r\n"  );
+      mutexUnlock(&printMutex);
             break;
          case '?':
             printHelpMenu();
