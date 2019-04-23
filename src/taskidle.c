@@ -20,6 +20,7 @@ taskParams_t taskIdleParams = {
    .param     = NULL,
    .func      = taskIdle,
    .hook      = defaultHook,
+   .init      = NULL,
 };
 
 WEAK void* taskIdle(void* a) // atributo weak para que pueda ser redefinida por el usuario sin tocar nada..

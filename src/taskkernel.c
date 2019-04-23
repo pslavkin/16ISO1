@@ -17,6 +17,11 @@ taskContext_t  kernelContext;
 //uso 16 bytes para el 1er llenado de datos al inicio.
 uint32_t       taskKernelPool[ MIN_STACK4FILL];
 
+void taskKernelInit(void)
+{
+   kernelContext.waterMark = 0x7FFFFFFF;        //como el kernel despues se queda con el stack del main, le pongo un wtaremark gigante para que a la primera se ajuste al valor correcto
+}
+
 taskParams_t taskKernelParams = {
    .name      = "taskKernel",
    .pool      = taskKernelPool,
@@ -24,6 +29,7 @@ taskParams_t taskKernelParams = {
    .param     = NULL,
    .func      = taskKernel,
    .hook      = defaultHook,
+   .init      = taskKernelInit,
 };
 
 //esta es la tarea que se llama desde pendsv. tiene su propio stack como cualquier tarea, pero
@@ -82,9 +88,11 @@ bool freeBlockedGived   ( event_t* m)             // cuando se hace un take, lib
          switch (tasks.list[i][k].state) {           // podria haber sido un if.. pero tengo otros planes
             case BLOCKED_GIVE:                       // aja, encontre una..veamos si me esta esperando...
                if(tasks.list[i][k].event==m) {       // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  disableSystickIrq();               // voy a modificar el eventAns, si llegara a entrar tick ahora y justo le da tout habria condicion de carrera..
                   tasks.list[i][k].event    = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
                   tasks.list[i][k].eventAns = true;  // perfecto, libero el recurso de manera correcta
                   tasks.list[i][k].state    = READY; // aviso que esta taera pasa a ready
+                  enableSystickIrq();                // habilito de nuevo el systick
                   if(i>=tasks.context->prior)        // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
                      return true;                    // aviso que voy a hacer yield, cuando termine de desbloquear todo
                }
@@ -107,10 +115,12 @@ bool freeBlockedTaked   ( event_t* m)              // cuando se hace el give, li
          switch (tasks.list[i][k].state) {           // podria haber sido un if.. pero tengo otros planes
             case BLOCKED_TAKE:                       // aja, encontre una..veamos si me esta esperando...
                if(tasks.list[i][k].event==m) {       // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  disableSystickIrq();               // voy a modificar el eventAns, si llegara a entrar tick ahora y justo le da tout habria condicion de carrera..
                   m->count--;
                   tasks.list[i][k].event    = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
                   tasks.list[i][k].eventAns = true;  // libero de manera correcta el recurso
                   tasks.list[i][k].state    = READY; // aviso que esta taera pasa a ready
+                  enableSystickIrq();                // habilito de nuevo el systick
                   if(i>=tasks.context->prior)        // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
                      yield = true;                   // aviso que voy a hacer yield, cuando termine de desbloquear todo
                }

@@ -21,6 +21,7 @@ taskParams_t taskKeyParams = {
    .param     = NULL,
    .func      = taskKey,
    .hook      = defaultHook,
+   .init      = NULL,
 };
 
 void* taskKey(void* a)

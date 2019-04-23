@@ -57,14 +57,15 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
       c->sp        = &t->pool[t->poolSize];  // pntero al FINAL del stack
       c->state     = READY;                  // arranca ready
       c->sleep     = 0;                      // sin timer
-//      c->event     = NULL;                   // TODO
-//      c->eventAns  = false;                  // TODO
-//      c->eventTout = false;                  // TODO
+      c->event     = NULL;                   // no hace falta, pero por prolijidad
+      c->eventAns  = false;                  // no hace falta, pero por prolijidad
+      c->eventTout = false;                  // no hace falta, pero por prolijidad
       c->prior     = prior;                  // defino la prioridad
       c->runCount  = 0;                      // numero de veces que corrio.
       strcpy   ( c->name ,t->name );         // la tarea guard su nombre
       pushTask ( t       ,c       );         // ahora emula como su estuviera corriendo
       c->waterMark = c->sp-c->pool;          // ahora que meti algo en el stack, defino el watermark
+      if(t->init!=NULL) t->init();           //si cargo alguna tarea de init, se lanza ahora. Este init esta pensado para hacer tareas de inicializacion ANTES de que arranque el scheduler, cosa de que todo este listo para toas las tareas antes de arrancar, porque si un recurso de una tarea es utilizado por la otra y al arrancar le toca primero a la ultima, podrian haber cosas sin inisializar.. sino tengo que inicializarlos en el main o algo.. mejor asi..
       return true;                           // TODO por ahora siempre funciona.. peeero
 }
 
@@ -74,16 +75,20 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
 bool taskCreate(taskParams_t* t, uint32_t prior)
 {
    uint8_t i;
+   //en estado empty significa que nunca fue usado.. si lo encuentro lo tomo
    for(i=0;i<MAX_TASK && tasks.list[prior][i].state!=EMPTY;i++)
       ;
+   //sin no hay en empty busco en delete, que es un lugar que no esta usado, pero que fue usado
+   //alguna vez, estoy usando DELETED solo para debug, para ver como se borra en la grilla de
+   //stat, pero tranquilamente se puede volar de todo el sistema
    if(i==MAX_TASK)
       for(i=0;i<MAX_TASK && tasks.list[prior][i].state!=DELETED;i++)
          ;
    if(i==MAX_TASK)
-      return false;
-   else {
+      return false;                                   // todo lleno.. vuelva mas tarde
+   else {                                             // encontro, cargo la tarea
       tasks.list[prior][i].number=i;
-      return taskFill(t,&tasks.list[prior][i],prior);
+      return taskFill(t,&tasks.list[prior][i],prior); // taskfill tambien podria fallar porque podria no contar con memoria, o algo, por ahora siempre anda
    }
 }
 
@@ -124,7 +129,6 @@ bool initTasks(void)
   // si, el kernel tambien es una tarea, aunque no esta en la lista de tareas  de tasks..
   // tiene su estructura aparte, pero los mismos parametros.
    taskFill(&taskKernelParams,&kernelContext,0);
-   kernelContext.waterMark = 0x7FFFFFFF;        //como el kernel despues se queda con el stack del main, le pongo un wtaremark gigante para que a la primera se ajuste al valor correcto
   // wah? el primer salto se hace desde main con el stack principal.. se lo regalo al
   // kerneltask por ahora, o sea en el primer salto de pendSV el sp del main se copiara al
   // taskKernel. Es por eso tambien que en la creacion del taskKernel se le asignan solo

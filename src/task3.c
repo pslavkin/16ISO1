@@ -19,6 +19,7 @@ taskParams_t task3Params = {
    .param     = NULL,
    .func      = task3,
    .hook      = defaultHook,
+   .init      = NULL,
 };
 
 void* task3(void* a)
@@ -26,7 +27,7 @@ void* task3(void* a)
    float  f=3.14;
    uint8_t data[20];                // se necesitan 15 para el numero mas grande representable +2147483647.647
    while(1) {
-      semphrTake ( &printfSemphr ); // con este mutex me evito que si otra
+      semphrTake ( &task1Semphr ); // con este mutex me evito que si otra
       gpioToggle ( LED3          );
       f*=1.005;
       queueWrite(&printQueue,ftostr(f,data));

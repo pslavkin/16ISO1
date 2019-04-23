@@ -13,6 +13,11 @@ int8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
 circularBuffer_t cb;
 queue_t printQueue;
 
+void taskPrintInit(void)
+{
+   queueInit ( &printQueue,&cb,cbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
+}
+
 taskParams_t taskPrintParams = {
    .name      = "taskPrint",
    .pool      = taskPrintPool,
@@ -20,13 +25,8 @@ taskParams_t taskPrintParams = {
    .param     = NULL,
    .func      = taskPrint,
    .hook      = defaultHook,
+   .init      = taskPrintInit,
 };
-void initPrintQueue(void)
-{
-   circularBuffer_Init ( &cb,cbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
-   queueInit           ( &printQueue,&cb                         );
-}
-
 void* taskPrint(void* a)
 {
    uint8_t data[MAX_MSG_LENGTH];

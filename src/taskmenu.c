@@ -19,6 +19,7 @@ taskParams_t taskMenuParams = {
    .param     = NULL,
    .func      = taskMenu,
    .hook      = defaultHook,
+   .init      = NULL,
 };
 
 void printHelpMenu(void)
@@ -46,14 +47,14 @@ void* taskMenu(void* a)
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {
          case '1':
-            if(semphrGiveTout(&printfSemphr,1,msec2Ticks(100))==false)
+            if(semphrGiveTout(&task1Semphr,1,msec2Ticks(100))==false)
                queueWrite ( &printQueue,"agoto semph\r\n");
             break;
          case '2':
-            semphrGive(&printfSemphr,2);
+            semphrGive(&task1Semphr,2);
             break;
          case '3':
-            semphrGive(&printfSemphr,3);
+            semphrGive(&task1Semphr,3);
             break;
          case '4':
             printTasksStat(&tasks);

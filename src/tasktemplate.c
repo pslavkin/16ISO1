@@ -22,6 +22,7 @@ taskParams_t taskTemplateParams = {
    .param    = NULL,
    .func     = taskTemplate,
    .hook     = defaultHook,
+   .init      = NULL,
 };
 
 void* taskTemplate(void* a)

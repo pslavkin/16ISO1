@@ -76,6 +76,7 @@ typedef struct    taskParams_struct {
    void*          (*func)(void*);         // funcion que arranca
    void*          param;                  // se le puede pasar un parametro al inicio tambien
    void*          (*hook)(void*);         // si func termina se llama a hook. si hook termina bum!
+   void           (*init)(void);          // funcion de inicializacion. Util para arrancar semaforos, colas, y demas en situaciones en donde se comparten cosas con otras tareas y se desea que ANTES de que arranque el schedul, estas cosas esten disponibles.
 } taskParams_t;
 
 //y si... es global.. la uso en switcher, y en taskKernel.. decido publicarla,
