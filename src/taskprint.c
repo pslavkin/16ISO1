@@ -7,7 +7,7 @@
 #include "mutex.h"
 #include "taskprint.h"
 
-uint32_t taskPrintPool[2*MIN_STACK];
+uint32_t taskPrintPool[BIG_STACK];
 int8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
 circularBuffer_t cb;
 queue_t printQueue;
@@ -15,7 +15,7 @@ queue_t printQueue;
 taskParams_t taskPrintParams = {
    .name      = "taskPrint",
    .pool      = taskPrintPool,
-   .pool_size = sizeof(taskPrintPool)/sizeof(taskPrintPool[0]),
+   .poolSize  = sizeof(taskPrintPool)/sizeof(taskPrintPool[0]),
    .param     = NULL,
    .func      = taskPrint,
    .hook      = defaultHook,

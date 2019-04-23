@@ -23,11 +23,12 @@ void printTaskStat(taskContext_t* t)
       "blocked_give"
    };
 
-   sprintf(data,"%16s | %12s | %5d | %5d | %8d | %8s%",
+   sprintf(data,"%16s | %12s | %5d | %5d/%5d | %8d | %8s%",
          t->name,          // nombre de fantasia
          status[t->state], // estado
          t->prior,         // prioridad de la tarea
-         t->waterMark,     // minima distancia entre el inicio del pool y por donde esta el sp
+         t->waterMark*4,   // minima distancia entre el inicio del pool y por donde esta el sp
+         t->poolSize*4,    // minima distancia entre el inicio del pool y por donde esta el sp
          t->runCount,      // numero de veces que fue atendida por el scheduler
          //aca viene la injusticia... solo es cualitativa la medicino (aunque anda muy bien
          //tengo que decir) pero solo toma la relacion de veces que fue atendida versus la
@@ -49,13 +50,13 @@ void printTasksStat(tasks_t* t)                             //imprimie la estadi
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
    uint8_t data[MAX_MSG_LENGTH];
-   sprintf(data,"%16s | %12s | %5s | %5s | %8s | %%%4s\r\n"
+   sprintf(data,"%16s | %12s | %5s | %11s | %8s | %%%4s\r\n"
                 "--------------------------------------------------------------------------\r\n",
-         "name",
-         "state",
+         "name    ",
+         "state   ",
          "prior",
-         "stack",
-         "run",
+         "stack/mem ",
+         "run   ",
          "use"
          );
    queueWrite(&printQueue,data);

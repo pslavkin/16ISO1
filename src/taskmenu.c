@@ -10,12 +10,12 @@
 #include "taskprint.h"
 #include "stat.h"
 
-uint32_t taskMenuPool[MIN_STACK];
+uint32_t taskMenuPool[REASONABLE_STACK];
 
 taskParams_t taskMenuParams = {
    .name      = "taskMenu",
    .pool      = taskMenuPool,
-   .pool_size = sizeof(taskMenuPool)/sizeof(taskMenuPool[0]),
+   .poolSize  = sizeof(taskMenuPool)/sizeof(taskMenuPool[0]),
    .param     = NULL,
    .func      = taskMenu,
    .hook      = defaultHook,

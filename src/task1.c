@@ -22,12 +22,12 @@ void initPrintfSemphr(void)
    semphrInit(&printfSemphr,5);
 }
 //------------------------------------------
-uint32_t task1Pool[MIN_STACK];
+uint32_t task1Pool[REASONABLE_STACK];
 
 taskParams_t task1Params = {
    .name      = "task1",
    .pool      = task1Pool,
-   .pool_size = sizeof(task1Pool)/sizeof(task1Pool[0]),
+   .poolSize  = sizeof(task1Pool)/sizeof(task1Pool[0]),
    .param     = NULL,
    .func      = task1,
    .hook      = defaultHook,
@@ -40,8 +40,9 @@ void* task1(void* a)
       //gpioToggle ( LED1                         ) ;
       //taskCreate ( &taskTemplateParams ,5       ) ;   //crea una tarea en tiempo real
       //semphrTake ( &printfSemphr                ) ;
+//      uartWriteString ( UART_USB    ,"1234" );
       gpioToggle ( LED1                         ) ;
-//      taskDelay(msec2Ticks(1));
+      taskDelay(msec2Ticks(100));
       //taskDelete ( taskFind(&taskTemplateParams ));   //la borra
    }
    return NULL;

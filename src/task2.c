@@ -12,12 +12,12 @@
 #include "taskprint.h"
 #include "stat.h"
 
-uint32_t task2Pool[MIN_STACK];
+uint32_t task2Pool[REASONABLE_STACK];
 
 taskParams_t task2Params = {
    .name      = "task2",
    .pool      = task2Pool,
-   .pool_size = sizeof(task2Pool)/sizeof(task2Pool[0]),
+   .poolSize  = sizeof(task2Pool)/sizeof(task2Pool[0]),
    .param     = NULL,
    .func      = task2,
    .hook      = defaultHook,

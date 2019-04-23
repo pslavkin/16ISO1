@@ -4,7 +4,7 @@
 #include "sapi.h"
 #include "taskidle.h"
 
-uint32_t taskIdlePool[MIN_STACK];
+uint32_t taskIdlePool[REASONABLE_STACK];
 taskContext_t  idleContext; // la tarea Idle esta fuera de la lista estatica de
                             // tareas, con lo cual se le asigna este contexto
                             // sueltito para que use.  de ese modo la idle es
@@ -16,7 +16,7 @@ taskContext_t  idleContext; // la tarea Idle esta fuera de la lista estatica de
 taskParams_t taskIdleParams = {
    .name      = "taskIdle",
    .pool      = taskIdlePool,
-   .pool_size = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
+   .poolSize  = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
    .param     = NULL,
    .func      = taskIdle,
    .hook      = defaultHook,

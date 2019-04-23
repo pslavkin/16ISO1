@@ -15,12 +15,12 @@ taskContext_t  kernelContext;
 
 //en el 1er salto, el sp se pisa con el del main... que tiene 32k, por eso solo
 //uso 16 bytes para el 1er llenado de datos al inicio.
-uint32_t       taskKernelPool[100];
+uint32_t       taskKernelPool[ MIN_STACK4FILL];
 
 taskParams_t taskKernelParams = {
    .name      = "taskKernel",
    .pool      = taskKernelPool,
-   .pool_size = sizeof(taskKernelPool)/sizeof(taskKernelPool[0]),
+   .poolSize  = sizeof(taskKernelPool)/sizeof(taskKernelPool[0]),
    .param     = NULL,
    .func      = taskKernel,
    .hook      = defaultHook,

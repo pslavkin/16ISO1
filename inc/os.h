@@ -9,8 +9,10 @@
 
 #define MAX_PRIOR        10  // 10 prioridades
 #define MAX_TASK         10  // 10 tareas x cada prioridad
-#define MIN_STACK        400 // minimo stack para cada tarea, pero igualmente cada tarea puede
-                             // elgir lo que desee
+#define MIN_STACK4FILL    17 // se necesitan minimo 17 datos de 32b para llenar el stack de cada tarea antes de lanzarlas por primera vez. menos de esto y explota. 
+#define REASONABLE_STACK 400 // minimo stack para cada tarea, pero igualmente cada tarea puede
+#define BIG_STACK        800 // algo decente como para guardar algo interesante...
+#define HUGE_STACK       3200// ok, mas vale que sepas lo que haces, son 3k de ram oara 1 tarea.. pero bueno 
 #define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.
 
 typedef struct    event_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
@@ -42,11 +44,12 @@ typedef struct    taskContext_struct {
                                           // goto? quien sabe, se podria hacer con algun define o otra variable suelta, u otra cosa?
                                           // see. pero es rapida, facil y no indexa. my room, my rules
    uint32_t*      pool;                   // puntero al inicio del stack (no al final) por el final arranca sp
-   int32_t        waterMark;   //TODO: comentar
-   uint32_t       runCount;   // TODO
+   uint32_t       poolSize;               // solo para fines de stat..
+   int32_t        waterMark;              // lleva cuenta del momento mas restringido que estuvo el stack, solo apra estadisticas
+   uint32_t       runCount;               // para dines estadisticos lleva cuenta  de cuantas veces se le asigno procesador.. aunque no dice cuanto tiempo lo utilizo..
    enum taskState state;                  // running, waiting, etc.
    event_t*       event;                  // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
-   uint32_t       sleep;             // aca lleva cuent de cuanto le falta para pasar a running
+   uint32_t       sleep;                  // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad
    uint8_t        number;                 // un numero que en realidad es la posicion dentro del arreglo estatico de la prioridad en la que elgio estar
@@ -67,7 +70,7 @@ typedef struct tasks_struct {
 typedef struct    taskParams_struct {
    char           name[TASK_NAME_LENGTH]; // nombre de fantasia
    uint32_t*      pool;                   // espacio para el stack
-   uint32_t       pool_size;              // tamanio del stack; sirve para arrancar desde el final y ver de no salirse
+   uint32_t       poolSize;               // tamanio del stack; sirve para arrancar desde el final y ver de no salirse
    void*          (*func)(void*);         // funcion que arranca
    void*          param;                  // se le puede pasar un parametro al inicio tambien
    void*          (*hook)(void*);         // si func termina se llama a hook. si hook termina bum!

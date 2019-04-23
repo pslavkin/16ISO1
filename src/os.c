@@ -52,8 +52,9 @@ bool pushTask(taskParams_t* t, taskContext_t* c)
 //los parametros que se pasan. el nombre, la prioridad, etc.
 bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
 {
-      c->pool      = t->pool;                // puntero al stack que usara la tarea
-      c->sp        = &t->pool[t->pool_size]; // pntero al FINAL del stack
+      c->pool      = t->pool;                // puntero al stack que usara la tarea, se usa solo para calcular el watermark y estadisticas, pero nada mas
+      c->poolSize  = t->poolSize;            // lo uso solo para fines de stat.. pero no se usa para otra cosa.
+      c->sp        = &t->pool[t->poolSize];  // pntero al FINAL del stack
       c->state     = READY;                  // arranca ready
       c->sleep     = 0;                      // sin timer
       c->prior     = prior;                  // defino la prioridad
@@ -120,6 +121,7 @@ bool initTasks(void)
   // si, el kernel tambien es una tarea, aunque no esta en la lista de tareas  de tasks..
   // tiene su estructura aparte, pero los mismos parametros.
    taskFill(&taskKernelParams,&kernelContext,0);
+   kernelContext.waterMark = 0x7FFFFFFF;        //como el kernel despues se queda con el stack del main, le pongo un wtaremark gigante para que a la primera se ajuste al valor correcto
   // wah? el primer salto se hace desde main con el stack principal.. se lo regalo al
   // kerneltask por ahora, o sea en el primer salto de pendSV el sp del main se copiara al
   // taskKernel. Es por eso tambien que en la creacion del taskKernel se le asignan solo
