@@ -75,17 +75,18 @@ end:
 bool freeBlockedGived   ( event_t* m)             // cuando se hace un take, libera las tareas esperando un give
 {
    int8_t i,j,k;
-   for (i=(MAX_PRIOR-1);i>=0;i--) {               // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
-      k=tasks.index[i];                           // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
-      for(j=0;j<MAX_TASK;j++) {                   // barro todas las tareas del grupo de prioridad
-         k=(k+1)%MAX_TASK;                        // incremento modulo MAX
-         switch (tasks.list[i][k].state) {        // podria haber sido un if.. pero tengo otros planes
-            case BLOCKED_GIVE:                    // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].event==m) {    // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
-                  tasks.list[i][k].event = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
-                  tasks.list[i][k].state = READY; // aviso que esta taera pasa a ready
-                  if(i>=tasks.context->prior)     // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
-                     return true;                 // aviso que voy a hacer yield, cuando termine de desbloquear todo
+   for (i=(MAX_PRIOR-1);i>=0;i--) {                  // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
+      k=tasks.index[i];                              // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;j<MAX_TASK;j++) {                      // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                           // incremento modulo MAX
+         switch (tasks.list[i][k].state) {           // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED_GIVE:                       // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].event==m) {       // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  tasks.list[i][k].event    = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].eventAns = true;  // perfecto, libero el recurso de manera correcta
+                  tasks.list[i][k].state    = READY; // aviso que esta taera pasa a ready
+                  if(i>=tasks.context->prior)        // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                     return true;                    // aviso que voy a hacer yield, cuando termine de desbloquear todo
                }
                break;
             default:
@@ -99,18 +100,19 @@ bool freeBlockedTaked   ( event_t* m)              // cuando se hace el give, li
 {
    bool yield=false;
    int8_t i,j,k;
-   for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {  // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
-      k=tasks.index[i];                            // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
-      for(j=0;m->count>0 && j<MAX_TASK;j++) {      // barro todas las tareas del grupo de prioridad
-         k=(k+1)%MAX_TASK;                        // incremento modulo MAX
-         switch (tasks.list[i][k].state) {         // podria haber sido un if.. pero tengo otros planes
-            case BLOCKED_TAKE:                     // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].event==m) {     // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+   for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {    // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
+      k=tasks.index[i];                              // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;m->count>0 && j<MAX_TASK;j++) {        // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                           // incremento modulo MAX
+         switch (tasks.list[i][k].state) {           // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED_TAKE:                       // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].event==m) {       // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
                   m->count--;
-                  tasks.list[i][k].event = NULL;   // TODO: no se si hace falta..borro el puntero al semphr
-                  tasks.list[i][k].state = READY;  // aviso que esta taera pasa a ready
-                  if(i>=tasks.context->prior)      // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
-                     yield = true;                 // aviso que voy a hacer yield, cuando termine de desbloquear todo
+                  tasks.list[i][k].event    = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].eventAns = true;  // libero de manera correcta el recurso
+                  tasks.list[i][k].state    = READY; // aviso que esta taera pasa a ready
+                  if(i>=tasks.context->prior)        // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                     yield = true;                   // aviso que voy a hacer yield, cuando termine de desbloquear todo
                }
                break;
             default:

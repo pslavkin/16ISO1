@@ -26,14 +26,27 @@ void SysTick_Handler(void)
                                                   // tasks.context. pero bueno, lo dejo porque podria
                                                   // usarse en el futuro.
 
-   for (i=(MAX_PRIOR-1);i>=0;i--) {               // arranca buscando desde la lista de tareas de max_prior para abajo a ver si hay alguna para pasar a ready
-      for(j=0;j<MAX_TASK;j++) {                   // recorre todas las tareas en cada prioridad
-         switch (tasks.list[i][j].state) {        // podria ser un if, pero tengo otros planes...
+   for (i=(MAX_PRIOR-1);i>=0;i--) {                     // arranca buscando desde la lista de tareas de max_prior para abajo a ver si hay alguna para pasar a ready
+      for(j=0;j<MAX_TASK;j++) {                         // recorre todas las tareas en cada prioridad
+         switch (tasks.list[i][j].state) {              // podria ser un if, pero tengo otros planes...
             case WAITING:
-               if(tasks.list[i][j].sleep > 0)     // comparo ANTES de descontar. oprque adminto un delay de cero
-                  tasks.list[i][j].sleep--;       // decremento y hasta la priximo
+               if(tasks.list[i][j].sleep > 0)           // comparo ANTES de descontar. oprque adminto un delay de cero
+                  tasks.list[i][j].sleep--;             // decremento y hasta la priximo
                else
-                  tasks.list[i][j].state = READY; // llego a cero! READY to work
+                  tasks.list[i][j].state = READY;       // llego a cero! READY to work
+               break;
+            case BLOCKED_GIVE:                          // para los estados bloqueados agrego la opcion de que tengan un timeout tambien
+            case BLOCKED_TAKE:
+               if(tasks.list[i][j].eventTout==true) {   // uso un flag para determinar si pidieron o no usar timeout
+                  if(tasks.list[i][j].sleep > 0) {      // comparo ANTES de descontar. oprque adminto un delay de cero
+                     tasks.list[i][j].sleep--;          // decremento y hasta la priximo
+                  }
+                  else {
+                     tasks.list[i][j].state    = READY; // llego a cero! READY to work
+                     tasks.list[i][j].event    = NULL;  // TODO: no se si hace falta..borro el puntero al semphr
+                     tasks.list[i][j].eventAns = false; // chan.. salio por timeout la tarea bloqueada, espero que el que llamo pregunte por este campo porque sino leera abasura..
+                  }
+               }
                break;
             default:
                break;

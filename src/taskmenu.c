@@ -10,7 +10,7 @@
 #include "taskprint.h"
 #include "stat.h"
 
-uint32_t taskMenuPool[REASONABLE_STACK];
+uint32_t taskMenuPool[BIG_STACK];
 
 taskParams_t taskMenuParams = {
    .name      = "taskMenu",
@@ -46,7 +46,8 @@ void* taskMenu(void* a)
       queueWrite  ( &printQueue,"\r\n" );
       switch (buf) {
          case '1':
-            semphrGive(&printfSemphr,1);
+            if(semphrGiveTout(&printfSemphr,1,msec2Ticks(100))==false)
+               queueWrite ( &printQueue,"agoto semph\r\n");
             break;
          case '2':
             semphrGive(&printfSemphr,2);

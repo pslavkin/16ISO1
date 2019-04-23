@@ -57,6 +57,9 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
       c->sp        = &t->pool[t->poolSize];  // pntero al FINAL del stack
       c->state     = READY;                  // arranca ready
       c->sleep     = 0;                      // sin timer
+//      c->event     = NULL;                   // TODO
+//      c->eventAns  = false;                  // TODO
+//      c->eventTout = false;                  // TODO
       c->prior     = prior;                  // defino la prioridad
       c->runCount  = 0;                      // numero de veces que corrio.
       strcpy   ( c->name ,t->name );         // la tarea guard su nombre

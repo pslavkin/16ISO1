@@ -41,8 +41,10 @@ void* task1(void* a)
       //taskCreate ( &taskTemplateParams ,5       ) ;   //crea una tarea en tiempo real
       //semphrTake ( &printfSemphr                ) ;
 //      uartWriteString ( UART_USB    ,"1234" );
+      if(semphrTakeTout ( &printfSemphr,msec2Ticks(8000))==false)
+        queueWrite(&printQueue,"agoto task1\r\n");
       gpioToggle ( LED1                         ) ;
-      taskDelay(msec2Ticks(100));
+      taskDelay(msec2Ticks(500));
       //taskDelete ( taskFind(&taskTemplateParams ));   //la borra
    }
    return NULL;

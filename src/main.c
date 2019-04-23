@@ -17,7 +17,7 @@ CONSOLE_PRINT_ENABLE
 int main( void )
 {
    boardConfig          (                  );
-   debugPrintConfigUart ( UART_USB, 115200 );
+   debugPrintConfigUart ( UART_USB, 300 );
 
    initPendsv ( );                     // se usa para solicitar que salte irq para el cambio de contexto
 

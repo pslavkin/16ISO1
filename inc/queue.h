@@ -10,8 +10,10 @@ typedef struct    queue_struct { // ok, si por ahora esta estructura no es muy u
    circularBuffer_t  *cb;
 } queue_t;
 
-bool                    queueInit  ( queue_t* q ,circularBuffer_t* cb );
-circularBufferStatus_t  queueWrite ( queue_t* q, void* data           );
-circularBufferStatus_t  queueRead  ( queue_t* q, void* data           );
+bool queueInit      ( queue_t* q ,circularBuffer_t* cb      );
+bool queueWriteTout ( queue_t* q, void* data, uint32_t tout );
+bool queueReadTout  ( queue_t* q, void* data, uint32_t tout );
+bool queueWrite     ( queue_t* q, void* data);
+bool queueRead      ( queue_t* q, void* data);
 
 #endif

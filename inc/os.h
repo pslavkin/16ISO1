@@ -13,7 +13,7 @@
 #define REASONABLE_STACK 400 // minimo stack para cada tarea, pero igualmente cada tarea puede
 #define BIG_STACK        800 // algo decente como para guardar algo interesante...
 #define HUGE_STACK       3200// ok, mas vale que sepas lo que haces, son 3k de ram oara 1 tarea.. pero bueno 
-#define TASK_NAME_LENGTH 16  // en el contexto de control tambien se guarda el nombre de fantasia.
+#define TASK_NAME_LENGTH 14  // en el contexto de control tambien se guarda el nombre de fantasia.
 
 typedef struct    event_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
    uint32_t count;                // lleva cuenta de cuantos gives se hicieron
@@ -49,6 +49,8 @@ typedef struct    taskContext_struct {
    uint32_t       runCount;               // para dines estadisticos lleva cuenta  de cuantas veces se le asigno procesador.. aunque no dice cuanto tiempo lo utilizo..
    enum taskState state;                  // running, waiting, etc.
    event_t*       event;                  // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
+   bool           eventAns;               // indica como fue desbloqueada la tarea, si fue por timeout o de manera correcta se libero el recurso
+   bool           eventTout;              // lo uso para indicar que el estado bloqueado tiene un tiempo maximo de espera cargado en sleep.
    uint32_t       sleep;                  // aca lleva cuent de cuanto le falta para pasar a running
    char           name[TASK_NAME_LENGTH]; // su identidad
    uint8_t        prior;                  // su priodidad

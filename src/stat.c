@@ -23,9 +23,10 @@ void printTaskStat(taskContext_t* t)
       "blocked_give"
    };
 
-   sprintf(data,"%16s | %12s | %5d | %5d/%5d | %8d | %8s%",
+   sprintf(data,"%14s | %12s | %5d | %5d | %5d/%5d | %8d | %8s%",
          t->name,          // nombre de fantasia
          status[t->state], // estado
+         t->sleep, // sleep pendiente
          t->prior,         // prioridad de la tarea
          t->waterMark*4,   // minima distancia entre el inicio del pool y por donde esta el sp
          t->poolSize*4,    // minima distancia entre el inicio del pool y por donde esta el sp
@@ -50,10 +51,11 @@ void printTasksStat(tasks_t* t)                             //imprimie la estadi
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
    uint8_t data[MAX_MSG_LENGTH];
-   sprintf(data,"%16s | %12s | %5s | %11s | %8s | %%%4s\r\n"
-                "--------------------------------------------------------------------------\r\n",
+   sprintf(data,"%14s | %12s | %5s | %5s | %11s | %8s | %%%4s\r\n"
+                "---------------------------------------------------------------------------------\r\n",
          "name    ",
          "state   ",
+         "sleep",
          "prior",
          "stack/mem ",
          "run   ",
