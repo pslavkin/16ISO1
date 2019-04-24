@@ -58,6 +58,7 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
       c->state     = READY;                  // arranca ready
       c->sleep     = 0;                      // sin timer
       c->event     = NULL;                   // no hace falta, pero por prolijidad
+      c->eventData = NULL;                   // no hace falta, pero por prolijidad
       c->eventAns  = false;                  // no hace falta, pero por prolijidad
       c->eventTout = false;                  // no hace falta, pero por prolijidad
       c->prior     = prior;                  // defino la prioridad

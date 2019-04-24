@@ -9,14 +9,14 @@
 #include "taskprint.h"
 
 uint32_t taskPrintPool[REASONABLE_STACK];
-int8_t  cbPool       [(MAX_PRINT_MSG+1)*MAX_MSG_LENGTH];
-circularBuffer_t cb;
+int8_t  printCbPool       [cbPoolSpace(MAX_PRINT_MSG,MAX_MSG_LENGTH)];
+circularBuffer_t printCb;
 queue_t printQueue;
 mutex_t printMutex;
 
 void taskPrintInit(void)
 {
-   queueInit ( &printQueue,&cb,cbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
+   queueInit ( &printQueue,&printCb,printCbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
    mutexInit ( &printMutex);
 }
 

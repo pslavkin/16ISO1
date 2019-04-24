@@ -6,6 +6,14 @@
 #include "sapi.h"
 #include "mutex.h"
 
+//calcula el espacio necesario apra qty itemes de lnegth bytes cada uno para armar un pool para
+//un buffer circular. Notar el +2, ya que si queres un solo item, necesitas tener 2 lugares
+//porque se escribe primero y luego se toma el semphr, pero ademas hay otro espacio mas que hay
+//que reservar por la arquitectura del buffer circular, con lo cual
+//para mandar 1 tenes que reservar espacio para 3. es asi.. Se supone igual que no haces una
+//cola para madar 1 solo mensaje.. pero bueno, es una limitante
+#define cbPoolSpace(qty,length)  ((qty+2)*length)
+
 typedef struct    queue_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
    event_t            s ;        //es el evento para leer y escribir la cola.
    circularBuffer_t  *cb;        //es el puntero a un tipo colacircular de la sapi

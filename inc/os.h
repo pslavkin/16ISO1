@@ -18,6 +18,7 @@
 typedef struct    event_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
    uint32_t count;                // lleva cuenta de cuantos gives se hicieron
    uint32_t max;                  // maximo de gives admitidos
+   void*  data; //TODO
 } event_t;
 
 enum taskState{
@@ -49,6 +50,7 @@ typedef struct    taskContext_struct {
    uint32_t       runCount;               // para dines estadisticos lleva cuenta  de cuantas veces se le asigno procesador.. aunque no dice cuanto tiempo lo utilizo..
    enum taskState state;                  // running, waiting, etc.
    event_t*       event;                  // lo uso para cuando encurntro una tarea bloqueada en la liberacino de un semaforo, ver que semaforo esta esperando, porque podria haber muchas tareas bloqueadas por diferentes semaforos..
+   void*          eventData;              // TODO
    bool           eventAns;               // indica como fue desbloqueada la tarea, si fue por timeout o de manera correcta se libero el recurso
    bool           eventTout;              // lo uso para indicar que el estado bloqueado tiene un tiempo maximo de espera cargado en sleep.
    uint32_t       sleep;                  // aca lleva cuent de cuanto le falta para pasar a running

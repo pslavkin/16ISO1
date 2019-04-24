@@ -6,6 +6,7 @@
 
 #define TASK1_BUFFER_SIZE 10
 extern queue_t       task1Queue;
+extern event_t       task1Event;
 extern taskParams_t  task1Params;
 
 typedef struct task1QueueStruct_struct
