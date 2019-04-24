@@ -18,7 +18,7 @@ bool queueInit ( queue_t* q ,
 {
    circularBuffer_Init ( cb ,bufferMemory ,amountOfElements ,elementSize );
    q->s.count = 0;                  // arranca en 1, que seria desbloqueado en 1 unidad
-   q->s.max   = amountOfElements-1; // reservo uno para mi porque PRIMERO escribo y luego doy ek semphr con lo cual tengo que tener siempre uno libre
+   q->s.max   = amountOfElements-2; // reservo uno para mi porque PRIMERO escribo y luego doy ek semphr con lo cual tengo que tener siempre uno libre
    q->cb      = cb;                 // guardo el puntero a la cola circular
    mutexInit(&q->mutex);            // inicializo el mutex que usa la cola para protejer el acceso al buffer circular
 };

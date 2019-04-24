@@ -21,7 +21,6 @@
 //
 event_t task1Event;
 
-#define TASK1_BUFFER_SIZE  10
 uint8_t buf[2][TASK1_BUFFER_SIZE];
 task1QueueStruct_t t1={
       .buf=buf[0],

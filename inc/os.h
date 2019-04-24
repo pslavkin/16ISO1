@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "event.h"
 
 #define WEAK        __attribute__ ((weak))
 #define ALIAS(f)    __attribute__ ((weak, alias (#f)))
@@ -14,12 +15,6 @@
 #define BIG_STACK        800 // algo decente como para guardar algo interesante...
 #define HUGE_STACK       3200// ok, mas vale que sepas lo que haces, son 3k de ram oara 1 tarea.. pero bueno 
 #define TASK_NAME_LENGTH 14  // en el contexto de control tambien se guarda el nombre de fantasia.
-
-typedef struct    event_struct { // ok, si por ahora esta estructura no es muy util.. pero tengo otros planes...
-   uint32_t count;                // lleva cuenta de cuantos gives se hicieron
-   uint32_t max;                  // maximo de gives admitidos
-   void*  data; //TODO
-} event_t;
 
 enum taskState{
    READY=0,      // esperando su turno.

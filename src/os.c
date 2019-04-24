@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "string.h"
+#include "event.h"
 #include "os.h"
 #include "taskkernel.h"
 #include "sapi.h"

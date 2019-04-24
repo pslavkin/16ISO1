@@ -11,6 +11,7 @@ bool eventInit ( event_t* s, uint32_t count )
    s->count = 0;     // arranca tomado, a diferencia del mutex.
    s->max   = count; // cantidad maxima de gives..
    s->data  = NULL; //TODO
+   return true;
 };
 //----------------------------------------------------------------------
 bool eventTake   ( event_t* s, void** data)
@@ -26,12 +27,14 @@ bool eventTakeTout   ( event_t* s, void** data, uint32_t tout )
       tasks.context->sleep     = tout;         // tiempo asignado al tout
       tasks.context->state     = BLOCKED_TAKE; // ok, ocupado..me pongo en BLOCKED_TAKE (no conundor con waiting)
       triggerPendSv();                         // y aca libero el uC, de modo que a partir de ahora soy una tarea BLOQUEAD.. y ahora? quien podra rescatarme??
-      *data=tasks.context->eventData;           // TODO
+      if(data!=NULL)
+         *data=tasks.context->eventData;           // TODO
       return tasks.context->eventAns;
    }
    else {
       s->count--;                              // me quedo con 1 unidad
-      *data=s->data;   //TODO
+      if(data!=NULL)
+         *data=s->data;   //TODO
    }
    if(freeBlockedGived(s)==true)               // si hubo al menos una tarea de mayour prioridad liberada, le cedo el uC
       taskYield();
