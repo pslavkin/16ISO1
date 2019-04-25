@@ -157,16 +157,6 @@ bool taskYield(void)
    tasks.context->state = READY;        // la tarea que llama claramente esta en running, pasa a ready
    triggerPendSv();                     // listo, llamo a cambio de contecto
 }
-bool taskBlockTake(void)
-{
-   tasks.context->state = BLOCKED_TAKE; // la bloqueo y no se quien la salva.. es para debug
-   triggerPendSv();                     // listo, llamo a cambio de contecto
-}
-bool taskBlockGive(void)
-{
-   tasks.context->state = BLOCKED_GIVE; // la bloqueo y no se quien la salva.. es para debug
-   triggerPendSv();                     // listo, llamo a cambio de contecto
-}
 
 WEAK void* defaultHook(void* p)
 {

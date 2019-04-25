@@ -89,7 +89,6 @@ extern tasks_t   tasks;
 bool           initTasks     ( void                            );
 bool           taskCreate    ( taskParams_t* t, uint32_t prior );
 bool           taskYield     ( void                            );
-bool           taskBlock     ( void                            );
 void           triggerPendSv ( void                            );
 bool           taskDelay     ( uint32_t t                      );
 void*          defaultHook   ( void*                           );

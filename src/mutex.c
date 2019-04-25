@@ -6,7 +6,7 @@
 bool mutexInit ( mutex_t* m )
 {
    m->count = 1; // arranca en 1, que seria desbloqueado en 1 unidad
-   m->max   = 1; //
+   m->max   = 1; // solo un evento para el mutex
 };
 bool mutexLock ( mutex_t* m )
 {
