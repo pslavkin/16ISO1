@@ -8,6 +8,7 @@
 extern queue_t       task1Queue;
 extern event_t       task1Event;
 extern taskParams_t  task1Params;
+void printBuffer(circularBuffer_t* cb);
 
 typedef struct task1QueueStruct_struct
 {

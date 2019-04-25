@@ -11,6 +11,7 @@
 #define MAX_PRIOR        10  // 10 prioridades
 #define MAX_TASK         10  // 10 tareas x cada prioridad
 #define MIN_STACK4FILL    17 // se necesitan minimo 17 datos de 32b para llenar el stack de cada tarea antes de lanzarlas por primera vez. menos de esto y explota. 
+#define SMALL_STACK      100 // minimo stack para cada tarea, pero igualmente cada tarea puede
 #define REASONABLE_STACK 400 // minimo stack para cada tarea, pero igualmente cada tarea puede
 #define BIG_STACK        800 // algo decente como para guardar algo interesante...
 #define HUGE_STACK       3200// ok, mas vale que sepas lo que haces, son 3k de ram oara 1 tarea.. pero bueno 

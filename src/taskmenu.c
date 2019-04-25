@@ -54,13 +54,14 @@ void* taskMenu(void* a)
 //            semphrGive(&task1Semphr,2);
             break;
          case '3':
+         printBuffer(task1Queue.cb);
  //           semphrGive(&task1Semphr,3);
             break;
          case '4':
             printTasksStat(&tasks);
             break;
          case '5': {
-            uint8_t data[MAX_MSG_LENGTH];
+            uint8_t data[5*MAX_MSG_LENGTH];
             sprintf    ( data,"ticks=%d\r\n",getTicks( ));
             queueWrite ( &printQueue,data              ) ;
             }

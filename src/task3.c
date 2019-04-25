@@ -30,7 +30,7 @@ void* task3(void* a)
    while(1) {
       uint8_t* b;
       eventTake(&task2Event,(void*)&b);
-      queueWrite ( &printQueue,b);
+//      queueWrite ( &printQueue,b);
    }
    return NULL;
 }

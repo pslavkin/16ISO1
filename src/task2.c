@@ -36,6 +36,7 @@ taskParams_t task2Params = {
 };
 
 task1QueueStruct_t* t1_copy;
+uint8_t t1_static[10];
 void* task2(void* a)
 {
    while(1) {
@@ -49,7 +50,8 @@ void* task2(void* a)
       t1_copy->buf[i-1]='\0';
       gpioToggle ( LED2 );
       eventGive(&task2Event,t1_copy->buf,1);
-      taskDelay(msec2Ticks(500));
+//      taskDelay(msec2Ticks(1000));
+//      queueRead(&task1Queue,&t1_static);
    }
    return NULL;
 }

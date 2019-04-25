@@ -8,8 +8,8 @@
 #include "mutex.h"
 #include "taskprint.h"
 
-uint32_t taskPrintPool[REASONABLE_STACK];
-int8_t  printCbPool       [cbPoolSpace(MAX_PRINT_MSG,MAX_MSG_LENGTH)];
+uint32_t taskPrintPool[BIG_STACK];
+int8_t  printCbPool   [cbPoolSpace(MAX_PRINT_MSG,MAX_MSG_LENGTH)];
 circularBuffer_t printCb;
 queue_t printQueue;
 mutex_t printMutex;
@@ -34,7 +34,8 @@ void* taskPrint(void* a)
    uint8_t data[MAX_MSG_LENGTH];
    while(1) {
       while(queueReadTout ( &printQueue ,data, msec2Ticks(10000))==false)
-         uartWriteString ( UART_USB    ,"nada para imprimir\r\n"  );
+//         uartWriteString ( UART_USB    ,"nada para imprimir\r\n"  );
+         ;
       gpioWrite          ( LEDG        ,true  );
       mutexLock          ( &printMutex        );
          uartWriteString ( UART_USB    ,data  );

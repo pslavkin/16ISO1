@@ -36,7 +36,7 @@ bool eventTakeTout   ( event_t* s, void** data, uint32_t tout )
       if(data!=NULL)
          *data=s->data;   //TODO
    }
-   if(freeBlockedGived(s)==true)               // si hubo al menos una tarea de mayour prioridad liberada, le cedo el uC
+if(freeBlockedGived(s)==true)               // si hubo al menos una tarea de mayour prioridad liberada, le cedo el uC
       taskYield();
    return true;
 };

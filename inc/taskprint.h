@@ -1,7 +1,7 @@
 #ifndef TASKPRINT
 #define TASKPRINT
 
-#define MAX_PRINT_MSG   3
+#define MAX_PRINT_MSG   20
 #define MAX_MSG_LENGTH 250
 
 extern queue_t       printQueue;
