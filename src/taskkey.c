@@ -12,6 +12,9 @@
 #include "stat.h"
 
 //------------------------------------------
+void updateKeyState         ( keys_t* keys,uint8_t i );
+void updateTec1AndTec2State ( keys_t* keys           );
+
 uint32_t taskKeyPool[REASONABLE_STACK];
 
 taskParams_t taskKeyParams = {
@@ -26,42 +29,43 @@ taskParams_t taskKeyParams = {
 
 void* taskKey(void* a)
 {
-   uint8_t i;
-   struct keys_struct{
-      uint8_t  state;
-      gpioMap_t name[4];
-   } keys= {.state=0x00, .name={TEC1,TEC2,TEC3,TEC4}};
-
+   keys_t keys = {
+      .state       = {1,1},
+      .tec1AndTec2 = 1,
+      .name        = {TEC1,TEC2}
+   };
    while(1) {
-      //barro las 4 teclas y junto el estado en un byte para poder hacer un switch y asi
-      //detectar pusaciones concurrentes y demas cosas mas practicas de hacer si todas las
-      //teclas estan actualizadas en un solo byte
-      for(i=0;i<sizeof(keys.name)/sizeof(keys.name[0]);i++) {
-         if(gpioRead(keys.name[i]))
-            keys.state &= ~(1<<i);  //aprovecho a invertir el estado.
-         else                       //1 representa apretado, y cero libreado
-            keys.state |= (1<<i);
+      for(uint8_t i=0;i<KEYS_QTY;i++) {
+         updateKeyState(&keys,i);
       }
-      switch  (keys.state) {
-         case 0x00:
-            break;
-         case 0x01:
-            queueWrite ( &printQueue,"Tec1\r\n" ) ;
-            break;
-         case 0x02:
-            queueWrite ( &printQueue,"Tec2\r\n" ) ;
-            break;
-         case 0x04:
-            queueWrite ( &printQueue,"Tec3\r\n" ) ;
-            break;
-         case 0x08:
-            queueWrite ( &printQueue,"Tec4\r\n" ) ;
-            break;
-         default:
-            queueWrite ( &printQueue,"invalid Tec\r\n" ) ;
-            break;
-      }
-      taskDelay(msec2Ticks(40));
+      updateTec1AndTec2State ( &keys         ) ;
+      taskDelay              ( msec2Ticks(10 ));
    }
-   return NULL;
 }
+
+void updateKeyState(keys_t* keys,uint8_t i)
+{
+   bool newState=gpioRead(keys->name[i]);
+   if((newState^keys->state[i])==1) {
+      keys->state[i]=newState;
+      uint32_t actualTick=getTicks();
+      if(newState==1)
+         keys->riseTime[i]=actualTick;
+      else
+         keys->fallTime[i]=actualTick;
+   }
+}
+void updateTec1AndTec2State(keys_t* keys)
+{
+   if(keys->tec1AndTec2==1) {
+      if( (keys->state[0] || keys->state[1])==0)
+         keys->tec1AndTec2=0;
+   }
+   else {
+      if( (keys->state[0] && keys->state[1])==1) {
+         keys->tec1AndTec2=1;
+         queueWrite(&task1Queue,keys);
+      }
+   }
+}
+

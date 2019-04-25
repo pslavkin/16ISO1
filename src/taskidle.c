@@ -26,7 +26,7 @@ taskParams_t taskIdleParams = {
 WEAK void* taskIdle(void* a) // atributo weak para que pueda ser redefinida por el usuario sin tocar nada..
 {
    while(1) {
-      gpioToggle(LEDB); // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
+      gpioToggle(LED3); // solo toglea un led ara verlo en la placa y pone a dormir todo hasta
       __WFI();          // la proxima irq
    }
    return NULL;

@@ -28,9 +28,7 @@ taskParams_t task3Params = {
 void* task3(void* a)
 {
    while(1) {
-      uint8_t* b;
-      eventTake(&task2Event,(void*)&b);
-//      queueWrite ( &printQueue,b);
+      taskDelay(msec2Ticks(1000));
    }
    return NULL;
 }

@@ -16,13 +16,8 @@
 
 uint32_t task2Pool[REASONABLE_STACK];
 
-semphr_t task2Semphr;
-event_t  task2Event;
-
 void task2Init(void)
 {
-   semphrInit ( &task2Semphr,5 );
-   eventInit  ( &task2Event,5  );
 }
 
 taskParams_t task2Params = {
@@ -35,23 +30,42 @@ taskParams_t task2Params = {
    .init      = task2Init,
 };
 
-task1QueueStruct_t* t1_copy;
-uint8_t t1_static[10];
+void setLedOff(void)
+{
+   gpioWrite(LEDG,0);
+   gpioWrite(LEDR,0);
+   gpioWrite(LED1,0);
+   gpioWrite(LEDB,0);
+}
+void setLed(uint8_t color)
+{
+   setLedOff();
+   switch(color) {
+      case 0:
+         gpioWrite(LEDG,1);
+         break;
+      case 1:
+         gpioWrite(LEDR,1);
+         break;
+      case 2:
+         gpioWrite(LED1,1);
+         break;
+      case 3:
+         gpioWrite(LEDB,1);
+         break;
+      default:
+         break;
+   }
+}
+
 void* task2(void* a)
 {
+   timing_t* t;
    while(1) {
-      eventTake(&task1Event,(void*)&t1_copy);
-      uint32_t i;
-      for(i=0;i<TASK1_BUFFER_SIZE;i++) {
-         t1_copy->buf[i]=(i%10)+(t1_copy->actual==0?'0':'A');
-      }
-      t1_copy->buf[i-3]='\r';
-      t1_copy->buf[i-2]='\n';
-      t1_copy->buf[i-1]='\0';
-      gpioToggle ( LED2 );
-      eventGive(&task2Event,t1_copy->buf,1);
-//      taskDelay(msec2Ticks(1000));
-//      queueRead(&task1Queue,&t1_static);
+      eventTake(&ledEvent,(void*)&t);
+      setLed    ( t->color   );
+      taskDelay ( t->sumT1T2 );
+      setLedOff (            );
    }
    return NULL;
 }

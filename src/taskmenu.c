@@ -8,6 +8,7 @@
 #include "task1.h"
 #include "taskmenu.h"
 #include "taskprint.h"
+#include "taskkey.h"
 #include "stat.h"
 
 uint32_t taskMenuPool[BIG_STACK];
@@ -51,10 +52,8 @@ void* taskMenu(void* a)
 //               queueWrite ( &printQueue,"agoto semph\r\n");
             break;
          case '2':
-//            semphrGive(&task1Semphr,2);
             break;
          case '3':
-         printBuffer(task1Queue.cb);
  //           semphrGive(&task1Semphr,3);
             break;
          case '4':

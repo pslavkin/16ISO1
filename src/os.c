@@ -148,9 +148,9 @@ void triggerPendSv(void)
 }
 bool taskDelay(uint32_t t)
 {
-   tasks.context->sleep = t;       // guardo los tiks. Cuando llegue a cero pasa a READY
-   tasks.context->state = WAITING; // o sea si guardo 2, hace tick->1 tick->0 tick->run
-   triggerPendSv();                // listo, llamo a cambio de contecto
+   tasks.context->sleep = t>0?(t-1):t; // si le pido 1 tick, me hace 2 saltos de systick. en el primero detecta que es uno y lo pone en cero, y en el proximo detecta cero y avisa.. por eso resto uno y al mismo tiempo controlo que no reviente con cero. 
+   tasks.context->state = WAITING;     // o sea si guardo 2, hace tick->1 tick->0 tick->run
+   triggerPendSv();                    // listo, llamo a cambio de contecto
 }
 bool taskYield(void)
 {

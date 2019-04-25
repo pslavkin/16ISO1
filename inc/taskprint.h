@@ -8,6 +8,7 @@ extern queue_t       printQueue;
 extern mutex_t       printMutex;
 extern taskParams_t  taskPrintParams;
 
-void* taskPrint      ( void* a              );
+void* taskPrint ( void* a                 );
+int printUART   ( const char *format, ... );
 
 #endif

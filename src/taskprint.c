@@ -1,3 +1,4 @@
+#include <stdarg.h>
 #include <stdint.h>
 #include <stdio.h>
 #include "string.h"
@@ -36,11 +37,20 @@ void* taskPrint(void* a)
       while(queueReadTout ( &printQueue ,data, msec2Ticks(10000))==false)
 //         uartWriteString ( UART_USB    ,"nada para imprimir\r\n"  );
          ;
-      gpioWrite          ( LEDG        ,true  );
+      gpioWrite          ( LED2        ,true  );
       mutexLock          ( &printMutex        );
          uartWriteString ( UART_USB    ,data  );
       mutexUnlock        ( &printMutex        );
-      gpioWrite          ( LEDG        ,false );
+      gpioWrite          ( LED2        ,false );
    }
    return NULL;
+}
+
+int printUART(const char *format, ...)
+{
+  va_list params;
+  uint8_t buf[MAX_MSG_LENGTH];
+  va_start   ( params, format );
+  vsnprintf  ( buf,sizeof(buf ),format,params);
+  queueWrite ( &printQueue,buf );
 }

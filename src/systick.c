@@ -66,7 +66,7 @@ uint32_t diffTicks(uint32_t first, uint32_t second)
    if(second>first)
       diff=second-first;
    else
-      diff=first-second;
+      diff=(0xFFFFFFFF-first)+second+1;   //aja... justo second pego la vuelta pero first no.. corrijo
    return diff;
 }
 uint32_t deltaTick(uint32_t first)

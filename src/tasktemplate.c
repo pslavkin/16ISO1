@@ -5,6 +5,7 @@
 #include "queue.h"
 #include "mutex.h"
 #include "systick.h"
+#include "taskprint.h"
 #include "tasktemplate.h"
 
 //es el stack de la tarea2. lo defino en base a los requisitos de lo que se pretende hacer. 
@@ -22,14 +23,14 @@ taskParams_t taskTemplateParams = {
    .param    = NULL,
    .func     = taskTemplate,
    .hook     = defaultHook,
-   .init      = NULL,
+   .init     = NULL,
 };
 
 void* taskTemplate(void* a)
 {
    while(1) {
       taskDelay  ( msec2Ticks(1000 ));
-      gpioToggle ( LED3            ) ;
+      gpioToggle ( LED2 );
    }
    return NULL;
 }
