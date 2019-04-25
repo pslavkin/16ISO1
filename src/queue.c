@@ -40,14 +40,16 @@ bool queueWriteTout ( queue_t* q, void* data, uint32_t tout)
    //elementos, tambien puedo solo madar 2..el optimo es que sea un semaforo menos que elemento
    //por el hecho de que primero escribo y luego hago give. Pero para permitir que se puedan
    //implementar colas de 1 solo elemento, voy a dejarlos igual semaforo y elementos de la cola
-   circularBufferStatus_t cbState;         
+   circularBufferStatus_t cbState;
    do {
-      mutexLock(&q->mutex);                // protejo el buffer circular
-         cbState=circularBufferWrite(q->cb,data);  // PRIMERO grabo. estoy seguro de que puedo porque la cola tiene un lugar vacio extra con respecto al semaforo.Lo hago asi porque si el Give funciona, ya despierta a las tareas que usaran el dato del buffer circular, asi que tiene que estar ya cargado..0 
+      mutexLock(&q->mutex);                       // protejo el buffer circular
+         cbState=circularBufferWrite(q->cb,data); // PRIMERO grabo. estoy seguro de que puedo porque la cola tiene un lugar vacio extra con respecto al semaforo.Lo hago asi porque si el Give funciona, ya despierta a las tareas que usaran el dato del buffer circular, asi que tiene que estar ya cargado..0
       mutexUnlock(&q->mutex);
       if(cbState!=CIRCULAR_BUFFER_FULL)
-         return semphrGiveTout(&q->s,1,tout); // POR ULTIMO, intento hacer un give, pero si no hay lugar bloqueo.
-      taskYield();
+         return semphrGiveTout(&q->s,1,tout);       // POR ULTIMO, intento hacer un give, pero si no hay lugar bloqueo.
+      else {
+         eventGiveBlock(&q->s,tout);
+      }
    } while (cbState==CIRCULAR_BUFFER_FULL);
 }
 bool queueRead ( queue_t* q, void* data)

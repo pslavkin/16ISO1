@@ -8,8 +8,8 @@
 #include "taskprint.h"
 #include "tasktemplate.h"
 
-//es el stack de la tarea2. lo defino en base a los requisitos de lo que se pretende hacer. 
-uint32_t taskTemplatePool[REASONABLE_STACK];
+//es el stack de la tarea. lo defino en base a los requisitos de lo que se pretende hacer. 
+uint32_t taskTemplatePool[SMALL_STACK];
 
 //reuno todos los datos de la tarea para pasarlo a initTask asi no tengo que
 //pasar tantos parametros y queda mas ordenado y limpio el codigo dejo fuera la
@@ -26,6 +26,7 @@ taskParams_t taskTemplateParams = {
    .init     = NULL,
 };
 
+//tarea blinky de debug
 void* taskTemplate(void* a)
 {
    while(1) {

@@ -19,11 +19,9 @@ typedef struct timing_struct
    uint8_t   color;
 }timing_t;
 
-extern event_t ledEvent;
+extern event_t       ledEvent;
 extern queue_t       task1Queue;
 extern taskParams_t  task1Params;
-void calcKeyDeltas  ( timing_t* t,keys_t* k    );
-void printKeyReport ( timing_t* t,keys_t* keys );
 
 void* task1            ( void* a );
 #endif

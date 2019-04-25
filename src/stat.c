@@ -24,10 +24,10 @@ void printTaskStat(taskContext_t* t)
       "blocked_give"
    };
 
-   sprintf(data,"%14s | %12s | %5d | %5d | %5d/%5d | %8d | %8s%",
+   printUART("%14s | %12s | %5d | %5d | %5d/%5d | %8d | %8s%",
          t->name,          // nombre de fantasia
          status[t->state], // estado
-         t->sleep, // sleep pendiente
+         t->sleep,         // sleep pendiente
          t->prior,         // prioridad de la tarea
          t->waterMark*4,   // minima distancia entre el inicio del pool y por donde esta el sp
          t->poolSize*4,    // minima distancia entre el inicio del pool y por donde esta el sp
@@ -46,13 +46,11 @@ void printTaskStat(taskContext_t* t)
          //no hacer nada , es un caso muyyy border...
          ftostr(((float)t->runCount*100)/kernelContext.runCount,data+MAX_MSG_LENGTH-15)
          );
-   queueWrite(&printQueue,data);
 }
 void printTasksStat(tasks_t* t)                             //imprimie la estadisticas de todas las tareas en la lista que no sen empty
 {
    int8_t i,j;                                                 // uso indices signados porque voy a comparar con >=0. se podria hacer tambien de otra manera
-   uint8_t data[MAX_MSG_LENGTH];
-   sprintf(data,"%14s | %12s | %5s | %5s | %11s | %8s | %%%4s\r\n"
+   printUART("%14s | %12s | %5s | %5s | %11s | %8s | %%%4s\r\n"
                 "---------------------------------------------------------------------------------\r\n",
          "name    ",
          "state   ",
@@ -62,7 +60,6 @@ void printTasksStat(tasks_t* t)                             //imprimie la estadi
          "run   ",
          "use"
          );
-   queueWrite(&printQueue,data);
    for (i=(MAX_PRIOR-1);i>=0;i--) {        // arranca siempre desde la maxima prioridad
       for(j=0;j<MAX_TASK;j++) {            // barro todas las tareas del grupo de prioridad
          if(t->list[i][j].state!=EMPTY)    // muestra en la tabla las que no estan empty. Ojo que si muestra las DELETED

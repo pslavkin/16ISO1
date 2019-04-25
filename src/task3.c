@@ -25,10 +25,12 @@ taskParams_t task3Params = {
    .init      = NULL,
 };
 
+//no la estoy usando por ahora
 void* task3(void* a)
 {
    while(1) {
       taskDelay(msec2Ticks(1000));
+      gpioToggle ( LED2 );
    }
    return NULL;
 }

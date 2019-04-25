@@ -78,7 +78,7 @@ end:
    enableSystickIrq();                                         // habilito d nuevo el systick
 }
 //-----------------------------------------------------------------------
-bool freeBlockedGived   ( event_t* m)             // cuando se hace un take, libera las tareas esperando un give
+bool freeBlockedGived   ( event_t* m)                // cuando se hace un take, libera las tareas esperando un give
 {
    int8_t i,j,k;
    for (i=(MAX_PRIOR-1);i>=0;i--) {                  // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
@@ -104,26 +104,26 @@ bool freeBlockedGived   ( event_t* m)             // cuando se hace un take, lib
    }
    return false;
 }
-bool freeBlockedTaked   ( event_t* m)              // cuando se hace el give, libera las tareas esperando un take
+bool freeBlockedTaked   ( event_t* m)                   // cuando se hace el give, libera las tareas esperando un take
 {
    bool yield=false;
    int8_t i,j,k;
-   for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {    // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
-      k=tasks.index[i];                              // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
-      for(j=0;m->count>0 && j<MAX_TASK;j++) {        // barro todas las tareas del grupo de prioridad
-         k=(k+1)%MAX_TASK;                           // incremento modulo MAX
-         switch (tasks.list[i][k].state) {           // podria haber sido un if.. pero tengo otros planes
-            case BLOCKED_TAKE:                       // aja, encontre una..veamos si me esta esperando...
-               if(tasks.list[i][k].event==m) {       // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
-                  disableSystickIrq();               // voy a modificar el eventAns, si llegara a entrar tick ahora y justo le da tout habria condicion de carrera..
+   for (i=(MAX_PRIOR-1);m->count>0 && i>=0;i--) {       // recorro todas las prioridades pero SOLO hago yield si encuentro alguna tarea de mi misma o mayoyr que necesita el uC
+      k=tasks.index[i];                                 // auxiliar para recorrer desde la ultima posicion de cada lista de prioridades
+      for(j=0;m->count>0 && j<MAX_TASK;j++) {           // barro todas las tareas del grupo de prioridad
+         k=(k+1)%MAX_TASK;                              // incremento modulo MAX
+         switch (tasks.list[i][k].state) {              // podria haber sido un if.. pero tengo otros planes
+            case BLOCKED_TAKE:                          // aja, encontre una..veamos si me esta esperando...
+               if(tasks.list[i][k].event==m) {          // si! me estaba esperando, le abro la puerta, si estaba bloqueada pero por otro semaforo, salteo
+                  disableSystickIrq();                  // voy a modificar el eventAns, si llegara a entrar tick ahora y justo le da tout habria condicion de carrera..
                   m->count--;
-                  tasks.list[i][k].event     = NULL;// TODO: no se si hace falta..borro el puntero al semphr
-                  tasks.list[i][k].eventData = m->data;  // libero de manera correcta el recurso
-                  tasks.list[i][k].eventAns  = true;  // libero de manera correcta el recurso
-                  tasks.list[i][k].state     = READY; // aviso que esta taera pasa a ready
-                  enableSystickIrq();                // habilito de nuevo el systick
-                  if(i>=tasks.context->prior)        // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
-                     yield = true;                   // aviso que voy a hacer yield, cuando termine de desbloquear todo
+                  tasks.list[i][k].event     = NULL;    // TODO: no se si hace falta..borro el puntero al semphr
+                  tasks.list[i][k].eventData = m->data; // libero de manera correcta el recurso
+                  tasks.list[i][k].eventAns  = true;    // libero de manera correcta el recurso
+                  tasks.list[i][k].state     = READY;   // aviso que esta taera pasa a ready
+                  enableSystickIrq();                   // habilito de nuevo el systick
+                  if(i>=tasks.context->prior)           // si la tarea que debloquie es de igual o mayor que la actual, tengo que hacer el yield! sino no. lo hace el kernel task luego, pero IGUAL la desbloqueo
+                     yield = true;                      // aviso que voy a hacer yield, cuando termine de desbloquear todo
                }
                break;
             default:
@@ -131,6 +131,5 @@ bool freeBlockedTaked   ( event_t* m)              // cuando se hace el give, li
          }
       }
    }
-   return yield;                                   // por ahora no uso la salida de esta func.
+   return yield;                                        // por ahora no uso la salida de esta func.
 }
-

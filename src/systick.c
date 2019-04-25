@@ -2,6 +2,7 @@
 #include "string.h"
 #include "systick.h"
 #include "os.h"
+#include "taskprint.h"
 #include "sapi.h"
 
 uint32_t tick = 0;     //cuenta con cada tick irq indefinidamente y la uso para calcular tiempos
@@ -72,4 +73,20 @@ uint32_t diffTicks(uint32_t first, uint32_t second)
 uint32_t deltaTick(uint32_t first)
 {
    return diffTicks(first,getTicks()); // le paso un tiempo inicial y me da la diferencia con el tiempo actual
+}
+
+void printUpTime(void)
+{
+   uint32_t hh;
+   uint8_t  mm,ss;
+   uint16_t msec;
+   uint32_t total=ticks2msec(getTicks());
+   hh     = total/ 3600000;
+   total -= hh*    3600000;
+   mm     = total/ 60000;
+   total -= mm*    60000;
+   ss     = total/ 1000;
+   total -= ss*    1000;
+   msec   = total;
+   printUART("%04d:%02d:%02d:%03d\r\n",hh,mm,ss,msec);
 }

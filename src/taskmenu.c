@@ -1,15 +1,12 @@
 #include <stdint.h>
-#include "string.h"
-#include "os.h"
 #include "sapi.h"
-#include "mutex.h"
-#include "semphr.h"
-#include "systick.h"
+#include "os.h"
 #include "task1.h"
+#include "stat.h"
+#include "systick.h"
+#include "task3.h"
 #include "taskmenu.h"
 #include "taskprint.h"
-#include "taskkey.h"
-#include "stat.h"
 
 uint32_t taskMenuPool[BIG_STACK];
 
@@ -25,59 +22,46 @@ taskParams_t taskMenuParams = {
 
 void printHelpMenu(void)
 {
-   uint8_t i;
-   uint8_t* help[]= {
-      "1 - hace 1 semphrGive\r\n",
-      "2 - hace 2 semphrGive\r\n",
-      "3 - hace 3 semphrGive\r\n",
-      "4 - stats\r\n",
-      "5 - ticks\r\n"
-   };
-   for(i=0;i<sizeof(help)/sizeof(help[0]);i++) {
-      queueWrite(&printQueue,help[i]);
-   }
+   printUART ( "1 - stats\r\n"
+               "2 - ticks\r\n"
+               "3 - uptime\r\n"
+               "4 - task3Create\r\n"
+               "5 - task3Delete\r\n"
+               "? - help\r\n");
 }
 void* taskMenu(void* a)
 {
    uint8_t buf;
    while(1) {
-      queueWrite  ( &printQueue,"ingrese codigo>" );
+      printUART ("ingrese codigo>" );
       while(uartReadByte( UART_USB, &buf)==false) {
          taskDelay(msec2Ticks(100));
       }
-      queueWrite  ( &printQueue,"\r\n" );
+      printUART ("\r\n" );
       switch (buf) {
          case '1':
-//            if(semphrGiveTout(&task1Semphr,1,msec2Ticks(100))==false)
-//               queueWrite ( &printQueue,"agoto semph\r\n");
-            break;
-         case '2':
-            break;
-         case '3':
- //           semphrGive(&task1Semphr,3);
-            break;
-         case '4':
             printTasksStat(&tasks);
             break;
-         case '5': {
-            uint8_t data[5*MAX_MSG_LENGTH];
-            sprintf    ( data,"ticks=%d\r\n",getTicks( ));
-            queueWrite ( &printQueue,data              ) ;
-            }
+         case '2':
+            printUART ("ticks=%d\r\n",getTicks( ));
             break;
-         case '6':
-      mutexLock(&printMutex);
-            uartWriteString ( UART_USB    ,"prueba de que corrompe\r\n"  );
-      mutexUnlock(&printMutex);
+         case '3':
+            printUpTime();
+            break;
+         case '4':
+            if(taskFind(&task3Params)==NULL)
+               taskCreate ( &task3Params,1);
+            break;
+         case '5':
+            taskDelete (taskFind(&task3Params));
             break;
          case '?':
             printHelpMenu();
             break;
          default:
-            queueWrite ( &printQueue,"invalid\r\n");
+            printUART ("invalid\r\n");
             break;
       }
    }
    return NULL;
 }
-
