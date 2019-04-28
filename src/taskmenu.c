@@ -22,7 +22,7 @@ taskParams_t taskMenuParams = {
 
 void printHelpMenu(void)
 {
-   printUART ( "1 - stats\r\n"
+   printUART ("1 - stats\r\n"
                "2 - ticks\r\n"
                "3 - uptime\r\n"
                "4 - task3Create\r\n"
@@ -32,6 +32,8 @@ void printHelpMenu(void)
 void* taskMenu(void* a)
 {
    uint8_t buf;
+   printUART ("\r\nPablo Slavkin - Examen iso1\r\n" );
+   printHelpMenu();
    while(1) {
       printUART ("ingrese codigo>" );
       while(uartReadByte( UART_USB, &buf)==false) {

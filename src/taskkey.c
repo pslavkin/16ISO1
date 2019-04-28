@@ -5,11 +5,24 @@
 #include "systick.h"
 #include "taskkey.h"
 #include "task1.h"
+#include "taskprint.h"
 
-void updateKeyState         ( keys_t* keys,uint8_t i );
-void updateTec1AndTec2State ( keys_t* keys           );
+//TODO: hay que deshabilitar la irq definida en el archivo del sensor oultrasonico
+#define OVERRIDE_SAPI_HCSR04_GPIO_IRQ
+
+event_t keyEvent;
+
+void updateKeyState         ( keys_t* keys,uint8_t i                                 );
+void updateTec1AndTec2State ( keys_t* keys                                           );
+void Set_Irq_Tec            ( uint8_t Irq_Ch,uint8_t Port, uint8_t Pin, Edges_T Edge );
+void printKeyStruct         ( keys_t* keys                                                    );
 //-----------------------------------------------------------
 uint32_t taskKeyPool[REASONABLE_STACK];
+
+void taskKeyInit(void)
+{
+   eventInit(&keyEvent,10);   //hasta 10 presionadas de tecla sin que se atiendan, dificilmente se logre esto a mano
+}
 
 taskParams_t taskKeyParams = {
    .name      = "taskKey",
@@ -18,7 +31,7 @@ taskParams_t taskKeyParams = {
    .param     = NULL,
    .func      = taskKey,
    .hook      = defaultHook,
-   .init      = NULL,
+   .init      = taskKeyInit,
 };
 
 void* taskKey(void* a)
@@ -28,18 +41,33 @@ void* taskKey(void* a)
       .tec1AndTec2 = 1,          //estado de la combinatoria de Tec1 y Tec2
       .name        = {TEC1,TEC2} //nombres de sapi para manejar las entradas
    };
+   uint32_t pressedKey;
+
+   Set_Irq_Tec(TEC1_INDEX ,0 ,4 ,BOTH_EDGE);     // TEC1
+   Set_Irq_Tec(TEC2_INDEX ,0 ,8 ,BOTH_EDGE);     // TEC2
    while(1) {
-      for(uint8_t i=0;i<KEYS_QTY;i++) {      //leo todas las teclas
-         updateKeyState(&keys,i);            //actualizo su estado
-      }
-      updateTec1AndTec2State ( &keys         ) ;   //actualizo ahora el estao conjunto de tec1 y tec2
-      taskDelay              ( msec2Ticks(10 ));   //pool cada 10mseg
+      eventTake              ( &keyEvent,(void* )&pressedKey); // espero que se oprima una tecla y recibo ademas cuel es en el evento
+      updateKeyState         ( &keys,pressedKey );             // actualizo su estado
+      updateTec1AndTec2State ( &keys            );             // actualizo ahora el estao conjunto de tec1 y tec2
+   }
+}
+
+void printKeyStruct(keys_t* keys)
+{
+   for(uint8_t i=0;i<KEYS_QTY;i++) {          // leo todas las teclas
+      printUART("state=%d riseTime=%d fallTime=%d name=%d tec1AndTec2=%d\r\n",
+            keys->state   [ i ],
+            keys->riseTime[ i ],
+            keys->fallTime[ i ],
+            keys->name    [ i ],
+            keys->tec1AndTec2);
    }
 }
 
 void updateKeyState(keys_t* keys,uint8_t i)
 {
-   bool newState=gpioRead(keys->name[i]);                     // leo el estado actuala
+   static uint8_t newState;
+   newState=gpioRead(keys->name[i]);                          // leo el estado actuala
    if(newState != keys->state[i]) {                           // si cambio
       keys->state[i]=newState;                                // actualizo
       (newState?keys->riseTime:keys->fallTime)[i]=getTicks(); // cargo el tiempo para rise o fall
@@ -57,4 +85,37 @@ void updateTec1AndTec2State(keys_t* keys)
          queueWrite(&task1Queue,keys);             //paso por copia la lista de todos los tiempo, para procesar y esta tarea vuelve a procesar teclas
       }
    }
+}
+
+void Set_Irq_Tec(uint8_t Irq_Ch,uint8_t Port, uint8_t Pin, Edges_T Edge )
+{
+    Chip_SCU_GPIOIntPinSel     ( Irq_Ch               ,Port ,Pin        ) ;
+    Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
+    Chip_PININT_SetPinModeEdge ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
+    NVIC_SetPriority           ( PIN_INT0_IRQn+Irq_Ch ,255              ) ;
+    NVIC_ClearPendingIRQ       ( PIN_INT0_IRQn+Irq_Ch                   ) ;
+    NVIC_EnableIRQ             ( PIN_INT0_IRQn+Irq_Ch                   ) ;
+    switch (Edge) {
+       case RISING_EDGE:
+             Chip_PININT_EnableIntHigh  ( LPC_GPIO_PIN_INT, PININTCH( Irq_Ch ));
+             break;
+       case FALLING_EDGE:
+             Chip_PININT_EnableIntLow   ( LPC_GPIO_PIN_INT, PININTCH( Irq_Ch ));
+             break;
+       case BOTH_EDGE:
+       default:
+             Chip_PININT_EnableIntHigh  ( LPC_GPIO_PIN_INT, PININTCH( Irq_Ch ));
+             Chip_PININT_EnableIntLow   ( LPC_GPIO_PIN_INT, PININTCH( Irq_Ch ));
+          break;
+    }
+}
+void GPIO1_IRQHandler(void)
+{
+   Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT ,PININTCH(TEC1_INDEX ));
+   eventGive ( &keyEvent ,(void*)0 ,1 );
+}
+void GPIO2_IRQHandler(void)
+{
+   Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT ,PININTCH(TEC2_INDEX ));
+   eventGive ( &keyEvent ,(void*)1 ,1 );
 }

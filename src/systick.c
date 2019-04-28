@@ -5,7 +5,7 @@
 #include "taskprint.h"
 #include "sapi.h"
 
-uint32_t tick = 0;     //cuenta con cada tick irq indefinidamente y la uso para calcular tiempos
+uint32_t tick =0; //cuenta con cada tick irq indefinidamente y la uso para calcular tiempos
 
 //agrego funciones para prender y apagar la irq del systick. Las uso antes de
 //entrar al taskKernel para evitar race condition contra tasks.list. Es una
@@ -79,14 +79,11 @@ void printUpTime(void)
 {
    uint32_t hh;
    uint8_t  mm,ss;
-   uint16_t msec;
-   uint32_t total=ticks2msec(getTicks());
-   hh     = total/ 3600000;
-   total -= hh*    3600000;
-   mm     = total/ 60000;
-   total -= mm*    60000;
-   ss     = total/ 1000;
-   total -= ss*    1000;
-   msec   = total;
-   printUART("%04d:%02d:%02d:%03d\r\n",hh,mm,ss,msec);
+   uint32_t total=ticks2sec(getTicks());
+   hh     = total/ 3600;
+   total -= hh*    3600;
+   mm     = total/ 60;
+   total -= mm*    60;
+   ss     = total;
+   printUART("%04d:%02d:%02d\r\n",hh,mm,ss);
 }

@@ -2,6 +2,17 @@
 #define KEY
 
 #define KEYS_QTY 2
+enum {
+   TEC1_INDEX=1,
+   TEC2_INDEX=2
+};
+
+typedef enum {
+   RISING_EDGE,
+   FALLING_EDGE,
+   BOTH_EDGE,
+} Edges_T;
+
 typedef struct keys_struct{
    uint8_t     state   [ KEYS_QTY ];
    uint32_t    riseTime[ KEYS_QTY ];
