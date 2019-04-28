@@ -150,6 +150,11 @@ bool initTasks(void)
   // tarea idle, fuera de la sabana de tareas, se ejecuta cuando no hay otra tarea en ready. 
    taskFill(&taskIdleParams,&idleContext,0);
 }
+void triggerPendSv4Isr(void)
+{
+   tasks.context->state=READY;   //como interrumpi una tarea que estaba en running, la paso a ready, ya que no tiene porque frenarse.. veremos si el uC esta de acuerdo, pero si lo esta, ya le tocare el turno nuevamente
+   triggerPendSv();              //ahora si llamo a irq
+}
 void triggerPendSv(void)
 {
    __ISB();

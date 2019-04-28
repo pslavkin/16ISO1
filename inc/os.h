@@ -91,6 +91,7 @@ bool           initTasks         ( void                            );
 bool           taskCreate        ( taskParams_t* t, uint32_t prior );
 bool           taskYield         ( void                            );
 void           triggerPendSv     ( void                            );
+void           triggerPendSv4Isr ( void                            );
 bool           taskDelay         ( uint32_t t                      );
 void*          defaultHook       ( void*                           );
 void           rien              ( void                            );

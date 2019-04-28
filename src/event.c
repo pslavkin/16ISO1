@@ -63,6 +63,17 @@ bool eventGiveTout   ( event_t* s, void* data, uint32_t qty, uint32_t tout)
       taskYield();
    return true;                                  // por ahora no uso la salida de esta func.
 };
+//esta api es diferente desde la isr porque por ejemplo nunca puede bloquear ni tener tout ni
+//nada, es otro contexto y lo manejo diferente...
+bool eventGiveTout4Isr  ( event_t* s, void* data, uint32_t qty)
+{
+   if((s->count+qty)<=s->max) {   // si no entra decido no mandar ninguno.. raro, pero bueno, prefiero nada a incompleto, pero es discutible
+      s->data   = data;           // cargo el dato del evento
+      s->count += qty;            // sumo la cantidad qty que se pide
+      return freeBlockedTaked(s); // libero las tareas que estaban esperando este smaforo pero NO llamo al schedule, lo decide la irq antes de salira
+   }
+   return false;
+};
 bool eventGiveBlock   ( event_t* s,uint32_t tout)
 {
    tasks.context->sleep     = tout>0?(tout-1):0; // fuera del while para que si se activa con un parcial de datos que no me alcanza para liberar el give, NO inicializo de nuevo el tput.. sigue descontando (si es que es un bloque con tout..)

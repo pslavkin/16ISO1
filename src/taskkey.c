@@ -81,7 +81,7 @@ void Set_Irq_Tec(uint8_t Irq_Ch,uint8_t Port, uint8_t Pin, Edges_T Edge )
     Chip_SCU_GPIOIntPinSel     ( Irq_Ch               ,Port ,Pin        ) ;
     Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
     Chip_PININT_SetPinModeEdge ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
-    NVIC_SetPriority           ( PIN_INT0_IRQn+Irq_Ch ,0                ) ;
+    NVIC_SetPriority           ( PIN_INT0_IRQn+Irq_Ch ,255              ) ;
     NVIC_ClearPendingIRQ       ( PIN_INT0_IRQn+Irq_Ch                   ) ;
     NVIC_EnableIRQ             ( PIN_INT0_IRQn+Irq_Ch                   ) ;
     switch (Edge) {
@@ -101,10 +101,12 @@ void Set_Irq_Tec(uint8_t Irq_Ch,uint8_t Port, uint8_t Pin, Edges_T Edge )
 void GPIO1_IRQHandler(void)
 {
    Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT ,PININTCH(TEC1_INDEX ));
-   eventGive ( &keyEvent ,(void*)0 ,1 );
+   if(eventGiveTout4Isr ( &keyEvent ,(void*)0 ,1 ))
+     triggerPendSv4Isr();
 }
 void GPIO2_IRQHandler(void)
 {
    Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT ,PININTCH(TEC2_INDEX ));
-   eventGive ( &keyEvent ,(void*)1 ,1 );
+   if(eventGiveTout4Isr ( &keyEvent ,(void*)1 ,1 ))
+    triggerPendSv4Isr();
 }
