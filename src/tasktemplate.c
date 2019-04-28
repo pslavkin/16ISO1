@@ -23,7 +23,8 @@ taskParams_t taskTemplateParams = {
    .param    = NULL,
    .func     = taskTemplate,
    .hook     = defaultHook,
-   .init     = NULL,
+   .begin    = rien,
+   .end      = rien,
 };
 
 //tarea blinky de debug

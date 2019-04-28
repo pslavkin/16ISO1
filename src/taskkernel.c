@@ -17,19 +17,20 @@ taskContext_t  kernelContext;
 //uso 16 bytes para el 1er llenado de datos al inicio.
 uint32_t       taskKernelPool[ MIN_STACK4FILL];
 
-void taskKernelInit(void)
+void taskKernelBegin(void)
 {
    kernelContext.waterMark = 0x7FFFFFFF;        //como el kernel despues se queda con el stack del main, le pongo un wtaremark gigante para que a la primera se ajuste al valor correcto
 }
 
 taskParams_t taskKernelParams = {
-   .name      = "taskKernel",
-   .pool      = taskKernelPool,
-   .poolSize  = sizeof(taskKernelPool)/sizeof(taskKernelPool[0]),
-   .param     = NULL,
-   .func      = taskKernel,
-   .hook      = defaultHook,
-   .init      = taskKernelInit,
+   .name     = "taskKernel",
+   .pool     = taskKernelPool,
+   .poolSize = sizeof(taskKernelPool)/sizeof(taskKernelPool[0]),
+   .param    = NULL,
+   .func     = taskKernel,
+   .hook     = defaultHook,
+   .begin    = taskKernelBegin,
+   .end      = rien,
 };
 
 //esta es la tarea que se llama desde pendsv. tiene su propio stack como cualquier tarea, pero

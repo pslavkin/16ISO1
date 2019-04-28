@@ -14,13 +14,14 @@ taskContext_t  idleContext; // la tarea Idle esta fuera de la lista estatica de
                             // scheduler no tiene lo que hacer...
 
 taskParams_t taskIdleParams = {
-   .name      = "taskIdle",
-   .pool      = taskIdlePool,
-   .poolSize  = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
-   .param     = NULL,
-   .func      = taskIdle,
-   .hook      = defaultHook,
-   .init      = NULL,
+   .name     = "taskIdle",
+   .pool     = taskIdlePool,
+   .poolSize = sizeof(taskIdlePool)/sizeof(taskIdlePool[0]),
+   .param    = NULL,
+   .func     = taskIdle,
+   .hook     = defaultHook,
+   .begin    = rien,
+   .end      = rien,
 };
 
 WEAK void* taskIdle(void* a) // atributo weak para que pueda ser redefinida por el usuario sin tocar nada..

@@ -11,13 +11,14 @@
 uint32_t taskMenuPool[BIG_STACK];
 
 taskParams_t taskMenuParams = {
-   .name      = "taskMenu",
-   .pool      = taskMenuPool,
-   .poolSize  = sizeof(taskMenuPool)/sizeof(taskMenuPool[0]),
-   .param     = NULL,
-   .func      = taskMenu,
-   .hook      = defaultHook,
-   .init      = NULL,
+   .name     = "taskMenu",
+   .pool     = taskMenuPool,
+   .poolSize = sizeof(taskMenuPool)/sizeof(taskMenuPool[0]),
+   .param    = NULL,
+   .func     = taskMenu,
+   .hook     = defaultHook,
+   .begin    = rien,
+   .end      = rien,
 };
 
 void printHelpMenu(void)
@@ -55,7 +56,7 @@ void* taskMenu(void* a)
                taskCreate ( &task3Params,1);
             break;
          case '5':
-            taskDelete (taskFind(&task3Params));
+            taskdelete4params (&task3Params);
             break;
          case '?':
             printHelpMenu();

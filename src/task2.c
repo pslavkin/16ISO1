@@ -17,19 +17,20 @@
 uint32_t task2Pool[SMALL_STACK];
 semphr_t ledSemphr;
 
-void initTask2(void)
+void task2Begin(void)
 {
    semphrInit(&ledSemphr,1);  //semaforo binario, ya que lo uso para ping pong entre task1 y esta
 }
 
 taskParams_t task2Params = {
-   .name      = "task2 Leds",
-   .pool      = task2Pool,
-   .poolSize  = sizeof(task2Pool)/sizeof(task2Pool[0]),
-   .param     = NULL,
-   .func      = task2,
-   .hook      = defaultHook,
-   .init      = initTask2,
+   .name     = "task2 Leds",
+   .pool     = task2Pool,
+   .poolSize = sizeof(task2Pool)/sizeof(task2Pool[0]),
+   .param    = NULL,
+   .func     = task2,
+   .hook     = defaultHook,
+   .begin    = task2Begin,
+   .end      = rien,
 };
 
 void setLedOff(void)

@@ -26,8 +26,8 @@ int main( void )
    taskCreate ( &taskMenuParams     ,2 ); // tarea que lee la UART y presenta una serie de opciones con '?' 
    taskCreate ( &task1Params        ,2 ); // tarea que calcula los delta temporales y los reparte a las tareas de leds y de impresion de reporte
    taskCreate ( &task2Params        ,2 ); // tarea que gestiona el delay de los leds que le llega por evento y devuelve un semaforo a la tarea de calculo cuando termina para que siga procesando el siguiente
-   taskCreate ( &task3Params        ,1 ); // dummy, para mostrar la creacion y borrado on run-time desde el menu de opciones
-   taskCreate ( &taskKeyParams      ,8 ); // polea las teclas y guarda los tiempos de fall y rise en una estructuaa
+//   taskCreate ( &task3Params        ,1 ); // dummy, para mostrar la creacion y borrado on run-time desde el menu de opciones
+   taskCreate ( &taskKeyParams      ,4 ); // polea las teclas y guarda los tiempos de fall y rise en una estructuaa
    taskCreate ( &taskTemplateParams ,5 ); // dummy para copiar y pegar y hacer otra tarea, ahora funciona como blinky
 
    initSystick   ( );                     // irq de base de tiempo

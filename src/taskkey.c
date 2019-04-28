@@ -19,7 +19,7 @@ void printKeyStruct         ( keys_t* keys                                      
 //-----------------------------------------------------------
 uint32_t taskKeyPool[REASONABLE_STACK];
 
-void taskKeyInit(void)
+void taskKeyBegin(void)
 {
    eventInit(&keyEvent,10);   //hasta 10 presionadas de tecla sin que se atiendan, dificilmente se logre esto a mano
 }
@@ -31,7 +31,8 @@ taskParams_t taskKeyParams = {
    .param     = NULL,
    .func      = taskKey,
    .hook      = defaultHook,
-   .init      = taskKeyInit,
+   .begin     = taskKeyBegin,
+   .end       = rien,
 };
 
 void* taskKey(void* a)
@@ -49,18 +50,6 @@ void* taskKey(void* a)
       eventTake              ( &keyEvent,(void* )&pressedKey); // espero que se oprima una tecla y recibo ademas cuel es en el evento
       updateKeyState         ( &keys,pressedKey );             // actualizo su estado
       updateTec1AndTec2State ( &keys            );             // actualizo ahora el estao conjunto de tec1 y tec2
-   }
-}
-
-void printKeyStruct(keys_t* keys)
-{
-   for(uint8_t i=0;i<KEYS_QTY;i++) {          // leo todas las teclas
-      printUART("state=%d riseTime=%d fallTime=%d name=%d tec1AndTec2=%d\r\n",
-            keys->state   [ i ],
-            keys->riseTime[ i ],
-            keys->fallTime[ i ],
-            keys->name    [ i ],
-            keys->tec1AndTec2);
    }
 }
 
@@ -92,7 +81,7 @@ void Set_Irq_Tec(uint8_t Irq_Ch,uint8_t Port, uint8_t Pin, Edges_T Edge )
     Chip_SCU_GPIOIntPinSel     ( Irq_Ch               ,Port ,Pin        ) ;
     Chip_PININT_ClearIntStatus ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
     Chip_PININT_SetPinModeEdge ( LPC_GPIO_PIN_INT     ,PININTCH( Irq_Ch ));
-    NVIC_SetPriority           ( PIN_INT0_IRQn+Irq_Ch ,255              ) ;
+    NVIC_SetPriority           ( PIN_INT0_IRQn+Irq_Ch ,0                ) ;
     NVIC_ClearPendingIRQ       ( PIN_INT0_IRQn+Irq_Ch                   ) ;
     NVIC_EnableIRQ             ( PIN_INT0_IRQn+Irq_Ch                   ) ;
     switch (Edge) {

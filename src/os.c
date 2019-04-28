@@ -67,7 +67,7 @@ bool taskFill(taskParams_t* t, taskContext_t* c, uint32_t prior)
       strcpy   ( c->name ,t->name );         // la tarea guard su nombre
       pushTask ( t       ,c       );         // ahora emula como su estuviera corriendo
       c->waterMark = c->sp-c->pool;          // ahora que meti algo en el stack, defino el watermark
-      if(t->init!=NULL) t->init();           //si cargo alguna tarea de init, se lanza ahora. Este init esta pensado para hacer tareas de inicializacion ANTES de que arranque el scheduler, cosa de que todo este listo para toas las tareas antes de arrancar, porque si un recurso de una tarea es utilizado por la otra y al arrancar le toca primero a la ultima, podrian haber cosas sin inisializar.. sino tengo que inicializarlos en el main o algo.. mejor asi..
+      t->begin();           //si cargo alguna tarea de init, se lanza ahora. Este init esta pensado para hacer tareas de inicializacion ANTES de que arranque el scheduler, cosa de que todo este listo para toas las tareas antes de arrancar, porque si un recurso de una tarea es utilizado por la otra y al arrancar le toca primero a la ultima, podrian haber cosas sin inisializar.. sino tengo que inicializarlos en el main o algo.. mejor asi..
       return true;                           // TODO por ahora siempre funciona.. peeero
 }
 
@@ -109,10 +109,20 @@ taskContext_t* taskFind(taskParams_t* t)
       }
    return NULL;
 }
+bool taskdelete4params(taskParams_t* p)
+{
+   taskContext_t* c=taskFind(p);
+   if(c!=NULL) {        // si me piden borrar una tarea null, explota!
+      p->end();         // se llama a la funcion de fin de tarea
+      c->state=DELETED; // se entiende? o lo tengo que explicar??
+   }
+   return true;
+}
 bool taskDelete(taskContext_t* c)
 {
-   if(c!=NULL)          // si me piden borrar una tarea NULL, explota!
+   if(c!=NULL) {        // si me piden borrar una tarea null, explota!
       c->state=DELETED; // se entiende? o lo tengo que explicar??
+   }
    return true;
 }
 
@@ -148,9 +158,9 @@ void triggerPendSv(void)
 }
 bool taskDelay(uint32_t t)
 {
-   tasks.context->sleep = t>0?(t-1):t; // si le pido 1 tick, me hace 2 saltos de systick. en el primero detecta que es uno y lo pone en cero, y en el proximo detecta cero y avisa.. por eso resto uno y al mismo tiempo controlo que no reviente con cero. 
-   tasks.context->state = WAITING;     // o sea si guardo 2, hace tick->1 tick->0 tick->run
-   triggerPendSv();                    // listo, llamo a cambio de contecto
+   tasks.context->sleep = t>0?(t-1):t;  // si le pido 1 tick, me hace 2 saltos de systick. en el primero detecta que es uno y lo pone en cero, y en el proximo detecta cero y avisa.. por eso resto uno y al mismo tiempo controlo que no reviente con cero.
+   tasks.context->state = WAITING;      // o sea si guardo 2, hace tick->1 tick->0 tick->run
+   triggerPendSv();                     // listo, llamo a cambio de contecto
 }
 bool taskYield(void)
 {
@@ -163,7 +173,7 @@ WEAK void* defaultHook(void* p)
    while(1)
       ;
 };
-void* fakeFun(void* p)  //la uso para enganiar al compilador para que no optimice algunas variables.. solo para debug
+void rien(void)                         // funcion que no hace nada, me evito preguntar por NULL a cada rato, mejor llamo siempre y el que no tiene nada que hacer, RIEN
 {
 };
 

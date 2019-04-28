@@ -27,7 +27,7 @@ circularBuffer_t t1Cb;
 queue_t task1Queue;
 event_t ledEvent;
 
-void task1Init(void)
+void task1Begin(void)
 {
    queueInit ( &task1Queue,&t1Cb,task1CbPool,TASK1_MSG_QTY,TASK1_MSG_LENGTH );
    eventInit(&ledEvent,1);
@@ -36,13 +36,14 @@ void task1Init(void)
 uint32_t task1Pool[REASONABLE_STACK];
 
 taskParams_t task1Params = {
-   .name      = "task1 deltas",
-   .pool      = task1Pool,
-   .poolSize  = sizeof(task1Pool)/sizeof(task1Pool[0]),
-   .param     = NULL,
-   .func      = task1,
-   .hook      = defaultHook,
-   .init      = task1Init,
+   .name     = "task1 deltas",
+   .pool     = task1Pool,
+   .poolSize = sizeof(task1Pool)/sizeof(task1Pool[0]),
+   .param    = NULL,
+   .func     = task1,
+   .hook     = defaultHook,
+   .begin    = task1Begin,
+   .end      = rien,
 };
 
 const uint8_t* colors_text[4] = {

@@ -74,7 +74,8 @@ typedef struct    taskParams_struct {
    void*          (*func)(void*);         // funcion que arranca
    void*          param;                  // se le puede pasar un parametro al inicio tambien
    void*          (*hook)(void*);         // si func termina se llama a hook. si hook termina bum!
-   void           (*init)(void);          // funcion de inicializacion. Util para arrancar semaforos, colas, y demas en situaciones en donde se comparten cosas con otras tareas y se desea que ANTES de que arranque el schedul, estas cosas esten disponibles.
+   void           (*begin)(void);         // funcion de inicializacion. Util para arrancar semaforos, colas, y demas en situaciones en donde se comparten cosas con otras tareas y se desea que ANTES de que arranque el schedul, estas cosas esten disponibles.
+   void           (*end)(void);           // funcion de inicializacion. Util para arrancar semaforos, colas, y demas en situaciones en donde se comparten cosas con otras tareas y se desea que ANTES de que arranque el schedul, estas cosas esten disponibles.
 } taskParams_t;
 
 //y si... es global.. la uso en switcher, y en taskKernel.. decido publicarla,
@@ -86,14 +87,15 @@ typedef struct    taskParams_struct {
 extern tasks_t   tasks;
 
 /*==================[declaraciones de datos externos]========================*/
-bool           initTasks     ( void                            );
-bool           taskCreate    ( taskParams_t* t, uint32_t prior );
-bool           taskYield     ( void                            );
-void           triggerPendSv ( void                            );
-bool           taskDelay     ( uint32_t t                      );
-void*          defaultHook   ( void*                           );
-void*          fakeFun       ( void* p                         );
-bool           taskDelete    ( taskContext_t* c                );
-taskContext_t* taskFind      ( taskParams_t* t                 );
+bool           initTasks         ( void                            );
+bool           taskCreate        ( taskParams_t* t, uint32_t prior );
+bool           taskYield         ( void                            );
+void           triggerPendSv     ( void                            );
+bool           taskDelay         ( uint32_t t                      );
+void*          defaultHook       ( void*                           );
+void           rien              ( void                            );
+bool           taskDelete        ( taskContext_t* c                );
+bool           taskdelete4params ( taskParams_t* p                 );
+taskContext_t* taskFind          ( taskParams_t* t                 );
 /*==================[end of file]============================================*/
 #endif

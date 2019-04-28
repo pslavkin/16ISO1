@@ -19,20 +19,21 @@ queue_t printQueue;       // y esta es la cola
 mutex_t printMutex;       // si otra tarea quiere usar los servicios de bajo nivel para imprimir sin pasar por la cola puede usar este mutex
 //esta func, corre ANTES de que se lance el scheduler, para dejar listo cosas que podrian ser
 //usadas por otras tareas, de modo que al primer tido de schedule todo este inicializado
-void taskPrintInit(void)
+void taskPrintBegin(void)
 {
    queueInit ( &printQueue,&printCb,printCbPool,MAX_PRINT_MSG,MAX_MSG_LENGTH );
    mutexInit ( &printMutex);
 }
 
 taskParams_t taskPrintParams = {
-   .name      = "taskPrint",
-   .pool      = taskPrintPool,
-   .poolSize  = sizeof(taskPrintPool)/sizeof(taskPrintPool[0]),
-   .param     = NULL,
-   .func      = taskPrint,
-   .hook      = defaultHook,
-   .init      = taskPrintInit,
+   .name     = "taskPrint",
+   .pool     = taskPrintPool,
+   .poolSize = sizeof(taskPrintPool)/sizeof(taskPrintPool[0]),
+   .param    = NULL,
+   .func     = taskPrint,
+   .hook     = defaultHook,
+   .begin    = taskPrintBegin,
+   .end      = rien,
 };
 
 void* taskPrint(void* a)
