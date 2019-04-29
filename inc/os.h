@@ -20,7 +20,7 @@
 enum taskState{
    READY=0,      // esperando su turno.
    WAITING,      // en este estado esta cuando se prende un taskDelay o un taskYield
-//   RUNNING,      // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
+   RUNNING,      // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
 //                 // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
 //                 // no se necesita para nada
    EMPTY,        // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta usando por ahora..

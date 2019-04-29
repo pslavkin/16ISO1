@@ -75,7 +75,7 @@ void* taskKernel(void* p)
    }
    tasks.context        = &idleContext;                        // ok, parece que esta tranquilo todo.. nada para hacer...
 end:
-//   tasks.context->state = RUNNING;                             // esto es absolutamente evitable. lo dejo solo para mantener las formas
+   tasks.context->state = RUNNING;                             // esto es absolutamente evitable. lo dejo solo para mantener las formas
    enableSystickIrq();                                         // habilito d nuevo el systick
 }
 //-----------------------------------------------------------------------
