@@ -8,15 +8,26 @@ seguir los siguientes pasaos para bajar el repo de la sapi y usar el mismo commi
 Asegurarse de tener la educiaa en el USB y el ultimo script correra el programa.
 abrir una terminal a 115200 y disfrutar
 ```c
+cd ~
+mkdir examen_pablo_slavkin
+cd examen_pablo_slavkin
 git clone  https://github.com/epernia/cese-edu-ciaa-template.git .
 git checkout 5cfb9cc
 git apply sapi.patch
 mkdir 16iso1
 cd 16iso1
 git clone https://github.com/pslavkin/16ISO1.git .
+git checkout entrega
+cd ..
 make
 ./16iso1/scipts/flash.sh
 ```
+
+Tambien se puede lanzar directamente el archivo install.sh que reune lo anterior:
+```c
+./install.h
+```
+
 ## Running the tests
 
 Cuando se corre el programa muestra un menu con 5 opciones
