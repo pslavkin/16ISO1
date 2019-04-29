@@ -1,3 +1,51 @@
+diff --git a/Makefile b/Makefile
+index f2eb798..89b9f08 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,6 +1,7 @@
+ # -------- Project path and name default values ------------------------
+ # Project path
+ # relative to this folder, leave void if the project is in this folder
++#
+ PROJECT_PATH =
+ # Project name
+ PROJECT_NAME = app
+@@ -25,11 +26,11 @@ SRC+=$(foreach m, $(MODULES), $(wildcard $(m)/src/*.c))
+ CXXSRC=$(wildcard $(PROJECT_PATH_AND_NAME)/src/*.cpp)
+ CXXSRC+=$(foreach m, $(MODULES), $(wildcard $(m)/src/*.cpp))
+ 
+-ASRC=$(wildcard $(PROJECT_PATH_AND_NAME)/src/*.s)
+-ASRC+=$(foreach m, $(MODULES), $(wildcard $(m)/src/*.s))
++ASRC=$(wildcard $(PROJECT_PATH_AND_NAME)/src/*.S)
++ASRC+=$(foreach m, $(MODULES), $(wildcard $(m)/src/*.S))
+ 
+ OUT=$(PROJECT_PATH_AND_NAME)/out
+-OBJECTS=$(CXXSRC:%.cpp=$(OUT)/%.o) $(ASRC:%.s=$(OUT)/%.o) $(SRC:%.c=$(OUT)/%.o)
++OBJECTS=$(CXXSRC:%.cpp=$(OUT)/%.o) $(ASRC:%.S=$(OUT)/%.o) $(SRC:%.c=$(OUT)/%.o)
+ DEPS=$(OBJECTS:%.o=%.d)
+ 
+ OOCD_SCRIPT=scripts/openocd/lpc4337.cfg
+@@ -103,7 +104,7 @@ $(OUT)/%.o: %.cpp
+ 	@mkdir -p $(dir $@)
+ 	$(Q)$(CXX) -MMD $(CXXFLAGS) -c -o $@ $<
+ 
+-$(OUT)/%.o: %.s
++$(OUT)/%.o: %.S
+ 	@echo AS $(notdir $<)
+ 	@mkdir -p $(dir $@)
+ 	$(Q)$(CC) -MMD $(CFLAGS) -c -o $@ $<
+diff --git a/libs/cmsis_core/src/armv7m_startup.c b/libs/cmsis_core/src/armv7m_startup.c
+index 7b7068d..8597a7b 100644
+--- a/libs/cmsis_core/src/armv7m_startup.c
++++ b/libs/cmsis_core/src/armv7m_startup.c
+@@ -22,7 +22,6 @@ WEAK void SVC_Handler(void);
+ WEAK void DebugMon_Handler(void);
+ WEAK void PendSV_Handler(void);
+ WEAK void SysTick_Handler(void);
+-
+ WEAK void initialise_monitor_handles(void);
+ 
+ void initialise_monitor_handles(void)
 diff --git a/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c b/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c
 index 2996df2..05bb49e 100644
 --- a/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c
@@ -39,16 +87,34 @@ index 2996df2..05bb49e 100644
 +//}
 +//#endif
  /*==================[end of file]============================================*/
-diff --git a/project.mk b/project.mk
-index 006bdd5..cea16be 100644
---- a/project.mk
-+++ b/project.mk
-@@ -20,4 +20,4 @@
- # Project path
- PROJECT_PATH = 
- # Project name
--PROJECT_NAME = 16iso1
-+PROJECT_NAME = app
+diff --git a/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_gpio.c b/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_gpio.c
+index 75ab47e..c72a157 100644
+--- a/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_gpio.c
++++ b/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_gpio.c
+@@ -312,7 +312,6 @@ bool_t gpioWrite( gpioMap_t pin, bool_t value )
+ 
+ bool_t gpioToggle( gpioMap_t pin )
+ {
+-
+    return gpioWrite( pin, !gpioRead(pin) );
+ }
+ 
+diff --git a/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_tick.c b/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_tick.c
+index 02a2a15..56a9b8b 100644
+--- a/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_tick.c
++++ b/libs/sapi/sapi_v0.5.2/soc/peripherals/src/sapi_tick.c
+@@ -47,9 +47,10 @@
+ #endif
+ 
+ /*==================[macros and definitions]=================================*/
++//#define TICK_OVER_RTOS
+ 
+ #ifndef TICK_OVER_RTOS
+-   #define tickerCallback SysTick_Handler
++//   #define tickerCallback SysTick_Handler
+ #endif
+ 
+ /*==================[internal data declaration]==============================*/
 diff --git a/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c b/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c
 index a4b1c50..2baf2c6 100644
 --- a/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c
@@ -77,3 +143,13 @@ index a4b1c50..2baf2c6 100644
 -// @ LPC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 \ No newline at end of file
 +// @ LPC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+diff --git a/project.mk b/project.mk
+index cea16be..006bdd5 100644
+--- a/project.mk
++++ b/project.mk
+@@ -20,4 +20,4 @@
+ # Project path
+ PROJECT_PATH = 
+ # Project name
+-PROJECT_NAME = app
++PROJECT_NAME = 16iso1

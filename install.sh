@@ -1,13 +1,15 @@
 cd ~
 mkdir examen_pablo_slavkin
 cd examen_pablo_slavkin
-git clone  https://github.com/epernia/cese-edu-ciaa-template.git .
+git clone  https://github.com/epernia/cese-edu-ciaa-template.git . -vv
 git checkout 5cfb9cc
-git apply sapi.patch
 mkdir 16iso1
 cd 16iso1
-git clone https://github.com/pslavkin/16ISO1.git .
-git checkout entrega
+git clone https://github.com/pslavkin/16ISO1.git . -v
+git checkout entrega -v
+cp sapi.patch ..
 cd ..
+git apply sapi.patch -v
 make
-./16iso1/scipts/flash.sh
+cd 16iso1
+./scripts/flash.sh
