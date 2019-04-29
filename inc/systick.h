@@ -1,7 +1,7 @@
 #ifndef SYSTICK
 #define SYSTICK
 /*===========================================================================*/
-#define systickTimeDivisor  20                           // no menos de 15, sino desborda el contador
+#define systickTimeDivisor  1000                         // no menos de 15, sino desborda el contador
                                                          // ojo con esta funcion que no se pase de rango.. fijate qye myltipkica x 1000
 #define ticks2msec(t)      ((t*1000)/systickTimeDivisor) // paso de msegs a ticks
 #define ticks2sec(t)       (t/systickTimeDivisor)        // paso de msegs a ticks

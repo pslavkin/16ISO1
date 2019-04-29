@@ -20,9 +20,9 @@
 enum taskState{
    READY=0,      // esperando su turno.
    WAITING,      // en este estado esta cuando se prende un taskDelay o un taskYield
-   RUNNING,      // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
-                 // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
-                 // no se necesita para nada
+//   RUNNING,      // tare en curso.. no hace falta, ya que esta tasks.context que sabe quien es la que
+//                 // esta en curso, y siempre hay una sola en cada instante... la dejo solo por convencion, pero
+//                 // no se necesita para nada
    EMPTY,        // se usa solo al inicio para indicar que el casillero esta vacio, pero no se esta usando por ahora..
    DELETED,      // solo para debug para que me deje rastro de que la tarea fue borrada on the fly y la vea en el stat..
    BLOCKED_TAKE, // distingo entre bloqueado porque hico un take de un evento y no hay nada..

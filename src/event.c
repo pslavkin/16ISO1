@@ -20,6 +20,7 @@ bool eventTake   ( event_t* s, void** data)
 }
 bool eventTakeTout   ( event_t* s, void** data, uint32_t tout )
 {
+   disableSystickIrq();
    if(s->count==0) {
       tasks.context->event     = s;                 // me guardo el puntero al semaforo que estoy esperando
       tasks.context->eventAns  = false;             // me guardo el puntero al semaforo que estoy esperando
@@ -38,6 +39,8 @@ bool eventTakeTout   ( event_t* s, void** data, uint32_t tout )
    }
    if(freeBlockedGived(s)==true)                    // si hubo al menos una tarea de mayour prioridad liberada, le cedo el uC
       taskYield();
+   else
+      enableSystickIrq();
    return true;
 };
 
@@ -47,6 +50,7 @@ bool eventGive   ( event_t* s , void* data, uint32_t qty)
 }
 bool eventGiveTout   ( event_t* s, void* data, uint32_t qty, uint32_t tout)
 {
+   disableSystickIrq();
    tasks.context->sleep     = tout>0?(tout-1):0; // fuera del while para que si se activa con un parcial de datos que no me alcanza para liberar el give, NO inicializo de nuevo el tput.. sigue descontando (si es que es un bloque con tout..)
    tasks.context->eventTout = tout>0;            // aca decido si es forever o tiene un tout
    tasks.context->event     = s;                 // me guardo el puntero al semaforo que estoy esperando
@@ -61,6 +65,8 @@ bool eventGiveTout   ( event_t* s, void* data, uint32_t qty, uint32_t tout)
    s->count += qty;                              // sumo la cantidad qty que se pide
    if(freeBlockedTaked(s)==true)                 // si hubo al menos una tarea de mayour prioridad liberada, le cedo el uC
       taskYield();
+   else
+      enableSystickIrq();
    return true;                                  // por ahora no uso la salida de esta func.
 };
 //esta api es diferente desde la isr porque por ejemplo nunca puede bloquear ni tener tout ni

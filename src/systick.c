@@ -11,8 +11,8 @@ uint32_t tick =0; //cuenta con cada tick irq indefinidamente y la uso para calcu
 //entrar al taskKernel para evitar race condition contra tasks.list. Es una
 //opcion para no deshabilitar todas las irqs.. por ahora con eso me alcanza
 void initSystick       ( void ) { SysTick_Config( SystemCoreClock /systickTimeDivisor)      ;} // ticks cada 10msegs
-void enableSystickIrq  ( void ) { SysTick->CTRL  |= SysTick_CTRL_TICKINT_Msk ;}
-void disableSystickIrq ( void ) { SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk;}
+void enableSystickIrq  ( void ) { SysTick->CTRL  |= SysTick_CTRL_TICKINT_Msk ; }
+void disableSystickIrq ( void ) { SysTick->CTRL  &= ~SysTick_CTRL_TICKINT_Msk; }
 
 void SysTick_Handler(void)
 {

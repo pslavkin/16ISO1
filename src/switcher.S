@@ -7,6 +7,7 @@
 .thumb_func                 // modo thumb,bit 0 en 1 para las direcciones. (antes de la 1ra instruccion)
 
 PendSV_Handler:
+//   cpsid if
 
    tst  lr,0x10             // equivale a lr & 0x00000010 para ver si esta prendido este but
    it eq                    // si es cero (mira el bit z del registro de control)
@@ -30,5 +31,6 @@ PendSV_Handler:
    it eq                    // si es cero (mira el bit z del registro de control)
    vpopeq {s16-s31}         // al ejec
 
+//   cpsie if
    bx   lr                  // y ahora si, como lr es 0xFFFFFFF9 popea el resto de los registros y sigue desde el PC que popeara
 
