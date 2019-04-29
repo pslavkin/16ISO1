@@ -71,7 +71,7 @@ bool eventGiveTout   ( event_t* s, void* data, uint32_t qty, uint32_t tout)
 };
 //esta api es diferente desde la isr porque por ejemplo nunca puede bloquear ni tener tout ni
 //nada, es otro contexto y lo manejo diferente...
-bool eventGiveTout4Isr  ( event_t* s, void* data, uint32_t qty)
+bool eventGive4Isr  ( event_t* s, void* data, uint32_t qty)
 {
    if((s->count+qty)<=s->max) {   // si no entra decido no mandar ninguno.. raro, pero bueno, prefiero nada a incompleto, pero es discutible
       s->data   = data;           // cargo el dato del evento

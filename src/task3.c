@@ -52,6 +52,7 @@ void* task3(void* a)
       eventTake(&task3Event,(void*)&s_task3);
       s_task3->f*=2.01;
       if(s_task3->f>10000) s_task3->f=1;
+      taskDelay(msec2Ticks(100));
    }
    return NULL;
 }
