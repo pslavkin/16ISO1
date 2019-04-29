@@ -1,0 +1,79 @@
+diff --git a/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c b/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c
+index 2996df2..05bb49e 100644
+--- a/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c
++++ b/libs/sapi/sapi_v0.5.2/external_peripherals/src/sapi_ultrasonic_hcsr04.c
+@@ -266,20 +266,20 @@ float ultrasonicSensorGetDistance(ultrasonicSensorMap_t aSensor, unitMap_t anUni
+ /*
+  * @Brief:   GPIO Echo interrupt handler for each sensor
+  */
+-#ifndef OVERRIDE_SAPI_HCSR04_GPIO_IRQ
+-void GPIO0_IRQHandler(void)
+-{
+-   serveInterrupt(0);
+-}
+-
+-void GPIO1_IRQHandler(void)
+-{
+-   serveInterrupt(1);
+-}
+-
+-void GPIO2_IRQHandler(void)
+-{
+-   serveInterrupt(2);
+-}
+-#endif
++//#ifndef OVERRIDE_SAPI_HCSR04_GPIO_IRQ
++//void GPIO0_IRQHandler(void)
++//{
++//   serveInterrupt(0);
++//}
++//
++//void GPIO1_IRQHandler(void)
++//{
++//   serveInterrupt(1);
++//}
++//
++//void GPIO2_IRQHandler(void)
++//{
++//   serveInterrupt(2);
++//}
++//#endif
+ /*==================[end of file]============================================*/
+diff --git a/project.mk b/project.mk
+index 006bdd5..cea16be 100644
+--- a/project.mk
++++ b/project.mk
+@@ -20,4 +20,4 @@
+ # Project path
+ PROJECT_PATH = 
+ # Project name
+-PROJECT_NAME = 16iso1
++PROJECT_NAME = app
+diff --git a/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c b/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c
+index a4b1c50..2baf2c6 100644
+--- a/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c
++++ b/libs/sapi/sapi_v0.5.2/soc/peripherals/usb/device/src/sapi_usb_device.c
+@@ -89,11 +89,11 @@ ErrorCode_t EP0_patch(USBD_HANDLE_T hUsb, void *data, uint32_t event)
+  * @brief   Handle interrupt from USB
+  * @return  Nothing
+  */
+-#ifndef USB_HOST_ONLY // Parche para envitar conflictos con biblioteca host
+-void USB_IRQHandler(void){
+-   USBD_API->hw->ISR(g_hUsb);
+-}
+-#endif
++//#ifndef USB_HOST_ONLY // Parche para envitar conflictos con biblioteca host
++//void USB_IRQHandler(void){
++//   USBD_API->hw->ISR(g_hUsb);
++//}
++//#endif
+ 
+ /* Find the address of interface descriptor for given class type. */
+ USB_INTERFACE_DESCRIPTOR *find_IntfDesc(const uint8_t *pDesc, uint32_t intfClass)
+@@ -294,4 +294,4 @@ static void usbDeviceLpcInterruptInit( void ){
+    USBD_API->hw->Connect( g_hUsb, 1 );
+ }
+ 
+-// @ LPC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+\ No newline at end of file
++// @ LPC >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
